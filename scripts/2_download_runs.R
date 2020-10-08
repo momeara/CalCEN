@@ -1,18 +1,32 @@
 # -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
 # vi: set ts=2 noet:
 
-
-library(SRAdb)
 library(plyr)
 library(dplyr)
 library(stringr)
 library(magrittr)
 library(glue)
+
+library(SRAdb)
+library(geomedb)
+
 source("scripts/parameters.R")
 
-ca_runs <- readr::read_tsv("product/ca_runs_180608.tsv")
+# first round from 2018
+#ca_runs <- readr::read_tsv("product/ca_runs_180608.tsv")
+#sra_dir <- paste0(base_dir, "/sra_80601")
+
+ca_runs <- readr::read_tsv("product/ca_runs_200928.tsv")
 SRAmetadb_fname <- paste0(base_dir, "/sra_meta/SRAmetadb.sqlite")
-sra_dir <- paste0(base_dir, "/sra_80601")
+sra_dir <- paste0(base_dir, "/sra")
+
+
+# by default the prefetch download directory is $HOME/ncbi/public/sra
+# to set download directory use ./vdb-config -i
+# see e.g. https://www.biostars.org/p/175096/
+if(!file.exists(sra_dir)){
+		dir.create(sra_dir)
+}
 
 
 if(!file.exists(SRAmetadb_fname)){
@@ -48,12 +62,19 @@ while(!done){
 			cat("Download SRA run '", ca_run$run_accession[1], "' for study '", ca_run$study_accession[1], "' (", n_runs, " runs to go)\n", sep="")
 
 		tryCatch({
-			SRAdb::getSRAfile(
-				in_acc=ca_run$run_accession[1],
-				sra_con=sra_con,
-				destDir=sra_dir,
-				fileType='sra',
-				makeDirectory=TRUE)
+			command <- paste0("cd ", sra_dir, " && ",
+					"prefetch ", ca_run$run_accession[1], " ",
+					"--progress 1 --ascp-options '-l1M'")
+			cat("Command: ", command, "\n", sep = "")
+			system(command)
+
+			# # this ftp based method has been depricated
+			# SRAdb::
+			# 	in_acc=ca_run$run_accession[1],
+			# 	sra_con=sra_con,
+			# 	destDir=sra_dir,
+			# 	fileType='sra',
+			# 	makeDirectory=TRUE)
 
 			n_runs <<- n_runs - 1
 
@@ -68,19 +89,18 @@ while(!done){
 
 # check retrieved runs for download integrety
 retrieved_runs <- list.files(
-	path=sra_dir,
+	path=paste0(sra_dir, "/sra"),
 	pattern="*.sra") %>%
 	stringr::str_extract("^[^.]+") %>%
-	tibble::data_frame(run_accession = .)
+	tibble::tibble(run_accession = .)
 
 validated_runs <- retrieved_runs %>%
 	plyr::adply(1, function(ca_run){
-		sra_fname <- paste0(sra_dir, "/", ca_run$run_accession, ".sra")
+		sra_fname <- paste0(sra_dir, "/sra/", ca_run$run_accession, ".sra")
 		cat("checking SRA run '", ca_run$run_accession[1], "': ", sra_fname, "\n", sep="")
-
 		is_consistent <- system2("vdb-validate", sra_fname, stdout=TRUE, stderr=TRUE) %>%
 			stringr::str_detect("is consistent") %>%
-			any
+			any()
 		tibble::data_frame(
 			sra_fname=sra_fname,
 			is_consistent = is_consistent)
