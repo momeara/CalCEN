@@ -10,14 +10,16 @@ library(glue)
 library(SRAdb)
 library(geomedb)
 
-source("scripts/parameters.R")
+source("parameters.R")
 
 # first round from 2018
 #ca_runs <- readr::read_tsv("product/ca_runs_180608.tsv")
 #sra_dir <- paste0(base_dir, "/sra_80601")
 
 ca_runs <- readr::read_tsv("product/ca_runs_200928.tsv")
+
 SRAmetadb_fname <- paste0(scratch_dir, "/sra_meta/SRAmetadb.sqlite")
+
 sra_dir <- paste0(scratch_dir, "/sra")
 
 

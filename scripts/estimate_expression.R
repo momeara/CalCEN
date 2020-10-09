@@ -5,7 +5,7 @@ library(plyr)
 library(dplyr)
 library(stringr)
 
-source("scripts/parameters.R")
+source("parameters.R")
 
 
 
