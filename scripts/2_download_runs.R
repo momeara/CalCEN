@@ -27,12 +27,13 @@ sra_dir <- paste0(scratch_dir, "/sra")
 # to set download directory use ./vdb-config -i
 # see e.g. https://www.biostars.org/p/175096/
 if(!file.exists(sra_dir)){
-		dir.create(sra_dir)
+		dir.create(paste0(scratch_dir, "/sra"))
+		dir.create(paste0(scratch_dir, "/sra_meta"))
 }
 
 
 if(!file.exists(SRAmetadb_fname)){
-	SRAdb::getSRAdbFile(destfile = SRAmetadb_fname)
+	SRAdb::getSRAdbFile(destdir = paste0(scratch_dir, "/sra_meta"))
 }
 
 sra_con <- DBI::dbConnect(RSQLite::SQLite(), SRAmetadb_fname)
@@ -66,7 +67,7 @@ while(!done){
 		tryCatch({
 			command <- paste0("cd ", sra_dir, " && ",
 					"prefetch ", ca_run$run_accession[1], " ",
-					"--progress 1 --ascp-options '-l1M'")
+					"--progress 1")
 			cat("Command: ", command, "\n", sep = "")
 			system(command)
 

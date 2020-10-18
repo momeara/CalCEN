@@ -7,11 +7,12 @@ library(stringr)
 library(readr)
 library(BioChemPantry)
 
-ca_runs <- readr::read_tsv("product/ca_runs_180608.tsv")
+ca_runs <- dplyr::bind_rows(
+		readr::read_tsv("product/ca_runs_180608.tsv"),
+		readr::read_tsv("product/ca_runs_200928.tsv"))
 
 gather_estimated_expression <- function(path){
 	cat("Gathering estimated expression for runs in '", path, "' ...\n", sep="")
-
 	estimated_expression <- list.files(
 		path=path,
 		pattern="*genes.results") %>%
@@ -37,7 +38,8 @@ gather_estimated_expression <- function(path){
 
 estimated_expression <- rbind(
 	gather_estimated_expression("intermediate_data/estimated_expression"),
-	gather_estimated_expression("intermediate_data/estimated_expression_180611"))
+	gather_estimated_expression("intermediate_data/estimated_expression_180611"),
+	gather_estimated_expression("intermediate_data/estimated_expression_20201007"))
 
 # gene_id and transcript_ids are 1-1
 #estimated_expression %>% BioChemPantry::summarize_map("gene_id", "transcript_ids")
@@ -45,4 +47,4 @@ estiamted_expression <- estimated_expression %>% dplyr::select(-transcript_ids)
 
 save(estimated_expression, file="intermediate_data/estimated_expression.Rdata")
 estimated_expression %>%
-	readr::write_tsv("product/estimated_expression_180621.tsv")
+	readr::write_tsv("product/estimated_expression_20201007.tsv")

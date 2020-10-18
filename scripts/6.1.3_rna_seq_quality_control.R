@@ -9,7 +9,10 @@ library(readr)
 library(ggplot2)
 library(scales)
 
-ca_runs <- readr::read_tsv("product/ca_runs_180608.tsv")
+ca_runs <- dplyr::bind_rows(
+		readr::read_tsv("product/ca_runs_180608.tsv"),
+		readr::read_tsv("product/ca_runs_200928.tsv"))
+
 load("intermediate_data/estimated_expression_meta.Rdata")
 
 

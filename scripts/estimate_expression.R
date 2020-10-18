@@ -17,11 +17,11 @@ estimate_expression <- function(
 	results_dir,
 	logs_dir,
 	work_dir,
-	n_threads=1,
-	reference_genome_path="/nfs/ex7/work/momeara/ca_coexp/reference_genome/SC5314_reference",
-	fastq_dump_program="~/opt/sratoolkit.2.9.0-ubuntu64/bin/fastq-dump",
-	rsem_calculate_expression_program="~/opt/bin/rsem-calculate-expression",
-	bowtie2_path="/mnt/nfs/home/momeara/opt/bowtie2-2.3.4.1-linux-x86_64"
+	reference_genome_path,
+	fastq_dump_program,
+	rsem_calculate_expression_program,
+	bowtie2_path,
+	n_threads=1
 ){
 	log_fname <-  paste0(work_dir, "/", run_accession, ".log")
 	cat("Writing logs to ", log_fname, "\n", sep="")
@@ -38,12 +38,19 @@ estimate_expression <- function(
 		"# n_threads: ", n_threads, "\n\n",
 		sep="", file=log_fname, append=TRUE)
 
-	run_cmd <- function(info, cmd_str, log_fname){
-		cat("# ", info, "\n", sep="", file=log_fname, append=TRUE)
+	run_cmd <- function(info, cmd_str, log_fname=NULL){
 		cmd_str <- paste0("cd ", work_dir, " && ", cmd_str)
-		cat(cmd_str, "\n", sep="", file=log_fname, append=TRUE)
-		system(paste0(cmd_str, " >> ", log_fname, " 2>&1"))
-		cat("\n\n", file=log_fname, append=TRUE)
+		if(!is.null(log_fname)){
+				cat("\n", sep = "", file = log_fname, append = TRUE)
+				cat("# ", info, "\n", sep = "", file = log_fname, append=TRUE)
+				cat(cmd_str, "\n", sep = "", file = log_fname, append=TRUE)
+				system(paste0(cmd_str, " >> ", log_fname, " 2>&1"))
+				cat("\n\n", file = log_fname, append=TRUE)
+		} else {
+				cat("# ", info, "\n", sep="")
+				cat(cmd_str, "\n", sep="")
+				system(cmd_str)
+		}
 	}
 
 	timing <- system.time({
@@ -58,9 +65,21 @@ estimate_expression <- function(
 				cmd_str=paste0(fastq_dump_program, " --gzip --skip-technical  --readids --read-filter pass --dumpbase --clip ", run_accession, ".sra"),
 				log_fname=log_fname)
 		} else {
+				# there is a typo in the fastq-dump command line arguments for version 2.10.8
+				# https://github.com/ncbi/sra-tools/issues/381
+				good_sra_version <- system(
+						command = paste0(fastq_dump_program, " --version"),
+						intern = TRUE)[2] %>%
+						stringr::str_extract("[0-9.]+$") %>%
+						compareVersion("2.10.8")
+			if(good_sra_version){
+				split_flag <- "--split-3"
+			} else {
+				split_flag <- "--split-e"
+			}
 			run_cmd(
 				info="Convert .sra to .fastq assuming paired-end reads",
-				cmd_str=paste0(fastq_dump_program, " --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-3 --clip ", run_accession, ".sra"),
+				cmd_str=paste0(fastq_dump_program, " --gzip --skip-technical  --readids --read-filter pass --dumpbase ", split_flag, " --clip ", run_accession, ".sra"),
 				log_fname=log_fname)
 		}
 
@@ -68,12 +87,12 @@ estimate_expression <- function(
 		if(!is_paired){
 			run_cmd(
 				info="Estimate expression levels assuming single-end reads",
-				cmd_str=paste0("~/opt/bin/rsem-calculate-expression -p ", n_threads, " --no-bam-output --estimate-rspd --bowtie2 --bowtie2-path ", bowtie2_path, " --append-names ", run_accession, "_pass.fastq.gz ", reference_genome_path, " ", run_accession),
+				cmd_str=paste0(rsem_calculate_expression_program, " -p ", n_threads, " --no-bam-output --estimate-rspd --bowtie2 --bowtie2-path ", bowtie2_path, " --append-names ", run_accession, "_pass.fastq.gz ", reference_genome_path, " ", run_accession),
 				log_fname=log_fname)
 		} else {
 			run_cmd(
 				info="Estimate expression levels assuming paired-end reads",
-				cmd_str=paste0("~/opt/bin/rsem-calculate-expression -p ", n_threads, " --paired-end --no-bam-output --estimate-rspd --bowtie2 --bowtie2-path ", bowtie2_path, " --append-names ", run_accession, "_pass_1.fastq.gz ", run_accession, "_pass_2.fastq.gz ", reference_genome_path, " ", run_accession),
+				cmd_str=paste0(rsem_calculate_expression_program, " -p ", n_threads, " --paired-end --no-bam-output --estimate-rspd --bowtie2 --bowtie2-path ", bowtie2_path, " --append-names ", run_accession, "_pass_1.fastq.gz ", run_accession, "_pass_2.fastq.gz ", reference_genome_path, " ", run_accession),
 				log_fname=log_fname)
 		}
 
@@ -93,10 +112,10 @@ estimate_expression <- function(
 	run_cmd(
 		info="Copy log file",
 		cmd_str=paste0("cp ", log_fname, " ", logs_dir),
-		log_fname="")
+		log_fname=NULL)
 
 	run_cmd(
 	  info="Removing working files",
 		cmd_str=paste0("rm ", work_dir, "/", run_accession, ".*"),
-		log_fname="")
+		log_fname=NULL)
 }

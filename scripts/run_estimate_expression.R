@@ -9,7 +9,10 @@ library(plyr)
 library(dplyr)
 library(readr)
 
-source("/nfs/home/momeara/work/collaborations/ca_coexp/scripts/estimate_expression.R")
+cat("Current working directory: ", getwd(), "\n", sep = "")
+
+source("parameters.R")
+source("scripts/estimate_expression.R")
 
 option_list <- list(
   optparse::make_option(
@@ -38,12 +41,17 @@ ca_run <- readr::read_tsv(opt$runs_fname) %>%
 timing <- system.time({
 
 	estimate_expression(
-		run_accession=ca_run$run_accession[1],
-		sra_fname=ca_run$sra_fname[1],
-		is_paired=ca_run$is_paired[1],
-		results_dir=opt$results_dir[1],
-		logs_dir=opt$logs_dir[1],
-		work_dir=opt$work_dir[1])
+		run_accession = ca_run$run_accession[1],
+		sra_fname = ca_run$sra_fname[1],
+		is_paired = ca_run$is_paired[1],
+		results_dir = opt$results_dir[1],
+		logs_dir = opt$logs_dir[1],
+		work_dir = opt$work_dir[1],
+		reference_genome_path = reference_genome_path,
+		fastq_dump_program = fastq_dump_program,
+		rsem_calculate_expression_program= rsem_calculate_expression_program,
+		bowtie2_path = bowtie2_path)
+
 })
 
 cat("Run time: ", timing[3], "\n", sep="")

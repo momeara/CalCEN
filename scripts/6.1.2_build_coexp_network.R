@@ -23,15 +23,13 @@ ca_coexp_network_full <- EGAD::build_coexp_network(
 	exprs=exprs,
 	gene.list=ca_genes)
 
-save(ca_coexp_network_full, file="product/ca_coexp_network_full_180704.Rdata")
+save(ca_coexp_network_full, file="product/ca_coexp_network_full_20201007.Rdata")
 ca_coexp_network_full %>%
 	as.data.frame() %>%
-	readr::write_tsv("product/ca_coexp_network_full_180704.tsv")
+	readr::write_tsv("product/ca_coexp_network_full_20201007.tsv")
 
 ca_coexp_full <- ca_coexp_network_full %>%
 	data.frame() %>%
 	tibble::rownames_to_column("feature_name_1") %>%
 	tidyr::gather(key="feature_name_2", value="score", -feature_name_1)
 save(ca_coexp_full, file="intermediate_data/ca_coexp_full.Rdata")
-
-

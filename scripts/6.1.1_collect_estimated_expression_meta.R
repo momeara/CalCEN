@@ -7,10 +7,8 @@ library(magrittr)
 library(stringr)
 library(readr)
 
+ca_runs <- readr::read_tsv("product/ca_runs_180608.tsv")
 
-ca_runs <- dplyr::bind_rows(
-		readr::read_tsv("product/ca_runs_180608.tsv"),
-		readr::read_tsv("product/ca_runs_200928.tsv"))
 
 estimated_expression_meta <- list.files(
 	path="intermediate_data/estimated_expression/logs",
@@ -89,7 +87,7 @@ estimated_expression_meta <- list.files(
 	})
 save(estimated_expression_meta, file="intermediate_data/estimated_expression_meta.Rdata")
 estimated_expression_meta %>%
-	readr::write_tsv("product/estimated_expression_meta_20201007.tsv")
+	readr::write_tsv("product/estimated_expression_meta_180621.tsv")
 
 
 

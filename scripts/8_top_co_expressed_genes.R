@@ -8,6 +8,7 @@ library(stringr)
 library(readr)
 
 load("intermediate_data/ca_coexp.Rdata")
+
 source("scripts/gene_report.R")
 
 top_ca_coexp <- ca_coexp %>%
@@ -134,3 +135,34 @@ interactions <- interactions %>%
 
 interactions %>%
 		readr::write_tsv("product/deORFinizing_seed_to_neighborhood_20201007.tsv")
+
+
+### seeds for kyla
+ca_coexp_for_kyla <- ca_coexp %>%
+	dplyr::semi_join(
+		readr::read_tsv("raw_data/seeds_selvig_20201013.tsv"),
+		by = c("feature_name_1" = "feature_name")) %>%
+	dplyr::filter(feature_name_1 != feature_name_2) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::group_by(feature_name_1) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::ungroup() %>%
+	gene_gene_report()
+
+ca_coexp_for_kyla %>%
+		readr::write_tsv("product/seeds_for_selvid_coexp_20201013.tsv")
+
+##########
+# ERG11
+
+report <- ca_coexp %>%
+	dplyr::filter(feature_name_1 == "C5_00660C_A") %>%
+	dplyr::filter(feature_name_2 != feature_name_1) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::select(-score) %>%
+	gene_gene_report()
+
+
+report %>%
+	readr::write_tsv("product/ERG11_gene_gene_report_20201015.tsv")
