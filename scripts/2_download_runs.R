@@ -45,7 +45,7 @@ while(!done){
 		path=sra_dir,
 		pattern="*.sra") %>%
 		stringr::str_extract("^[^.]+") %>%
-		tibble::data_frame(run_accession = .)
+		tibble::tibble(run_accession = .)
 
 	to_get_runs <- ca_runs %>%
 		dplyr::anti_join(
@@ -104,7 +104,7 @@ validated_runs <- retrieved_runs %>%
 		is_consistent <- system2("vdb-validate", sra_fname, stdout=TRUE, stderr=TRUE) %>%
 			stringr::str_detect("is consistent") %>%
 			any()
-		tibble::data_frame(
+		tibble::tibble(
 			sra_fname=sra_fname,
 			is_consistent = is_consistent)
 	})

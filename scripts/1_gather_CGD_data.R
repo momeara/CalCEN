@@ -124,7 +124,7 @@ save(cgd_id_2_uniprot_accn, file="intermediate_data/cgd_id_2_uniprot_accn.Rdata"
 chromosome_feature_to_alias <- chromosome_features %>%
 	dplyr::select(feature_name, aliases) %>%
 	plyr::adply(1, function(feature){
-		tibble::data_frame(
+		tibble::tibble(
 			alias=feature$aliases[1] %>%
 				stringr::str_split("[|]") %>%
 				unlist())

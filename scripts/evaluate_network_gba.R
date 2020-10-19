@@ -75,7 +75,7 @@ evaluate_network_gba <- function(
 				gba <- EGAD::run_GBA(net, annotation_set, nfold=nfold)
 				cat("mean: ", gba[[1]][,1] %>% mean(na.rm=TRUE), "std: ", gba[[1]][,1] %>% sd(na.rm=TRUE), "\n", sep=" ")
 
-				tibble::data_frame(
+				tibble::tibble(
 					anno_id=anno_id,
 					network_id=network_id,
 					auroc_mean = gba[[1]][,1] %>% mean(na.rm=TRUE),

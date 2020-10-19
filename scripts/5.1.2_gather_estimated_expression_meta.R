@@ -7,15 +7,25 @@ library(magrittr)
 library(stringr)
 library(readr)
 
-
 ca_runs <- dplyr::bind_rows(
 		readr::read_tsv("product/ca_runs_180608.tsv"),
 		readr::read_tsv("product/ca_runs_200928.tsv"))
 
-estimated_expression_meta <- list.files(
-	path="intermediate_data/estimated_expression/logs",
-	pattern="*log") %>%
-	data.frame(log_fname=., stringsAsFactors=FALSE) %>%
+log_files <- dplyr::bind_rows(
+		list.files(
+				path="intermediate_data/estimated_expression/logs",
+				pattern="*log") %>%
+		data.frame(log_fname=., stringsAsFactors=FALSE),
+		list.files(
+				path="intermediate_data/estimated_expression_180611/logs",
+				pattern="*log") %>%
+		data.frame(log_fname=., stringsAsFactors=FALSE),
+		list.files(
+				path="intermediate_data/estimated_expression_20201007/logs",
+				pattern="*log") %>%
+		data.frame(log_fname=., stringsAsFactors=FALSE))
+
+estimated_expression_meta <- log_files  %>%
 	dplyr::mutate(
 		run_accession = log_fname %>% stringr::str_extract("^[^.]+")) %>%
 	dplyr::left_join(
@@ -23,16 +33,14 @@ estimated_expression_meta <- list.files(
 		by="run_accession") %>%
 	plyr::adply(1, function(run){
 		log_fname <- run$log_fname[1]
-		# cat("processing log file: ", log_fname, " ...\n", sep="")
+		cat("processing log file: ", log_fname, " ...\n", sep="")
 		lines <- readr::read_lines(
 			file=paste0("intermediate_data/estimated_expression/logs/", log_fname))
-
 		n_reads <- lines %>%
 			stringr::str_detect(" reads; of these:") %>%
 			magrittr::extract(lines, .) %>%
 			stringr::str_extract("^[0-9]+") %>%
 			as.numeric()
-
 		if(!run$is_paired[1]){
 			n_reads_unpaired <- lines %>%
 				stringr::str_detect(" were unpaired; of these:") %>%
@@ -56,9 +64,7 @@ estimated_expression_meta <- list.files(
 				cat("The run is paired and there were ", n_reads, " reads but only ", n_unpaired, " paired reads.\n", sep="")
 			}
 		}
-
-
-		tibble::data_frame(
+		tibble::tibble(
 			n_reads = n_reads,
 			n_reads_aligned_0_times = lines %>%
 				stringr::str_detect(" aligned[ a-z]* 0 times") %>%
@@ -87,9 +93,11 @@ estimated_expression_meta <- list.files(
 				stringr::str_extract("[0-9.]+$") %>%
 				as.numeric())
 	})
+
+
 save(estimated_expression_meta, file="intermediate_data/estimated_expression_meta.Rdata")
 estimated_expression_meta %>%
-	readr::write_tsv("product/estimated_expression_meta_20201007.tsv")
+	readr::write_tsv("product/estimated_expression_meta_180621.tsv")
 
 
 

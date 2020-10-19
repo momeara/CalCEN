@@ -45,7 +45,12 @@ install_prerequisites:
 	popd
 
 make ca_coexp:
+	cp scripts/parameters_template.R parameters.R
 	Rscript scripts/1_define_runs.R
 	Rscript scripts/2_download_runs.R
 	Rscript scripts/3_reference_genome.R
 	Rscript scripts/4_submit_estimate_expression.R
+	Rscript scripts/5_gather_estimated_expression.R
+	Rscript scripts/6.1.1_collect_estimated_expression_meta.R
+	Rscript scripts/6.1.2_build_coexp_network.R
+	Rscript scripts/6.1.3_rna_seq_quality_control.R
