@@ -11,31 +11,29 @@ ca_runs <- dplyr::bind_rows(
 		readr::read_tsv("product/ca_runs_180608.tsv"),
 		readr::read_tsv("product/ca_runs_200928.tsv"))
 
-log_files <- dplyr::bind_rows(
-		list.files(
-				path="intermediate_data/estimated_expression/logs",
-				pattern="*log") %>%
-		data.frame(log_fname=., stringsAsFactors=FALSE),
-		list.files(
-				path="intermediate_data/estimated_expression_180611/logs",
-				pattern="*log") %>%
-		data.frame(log_fname=., stringsAsFactors=FALSE),
-		list.files(
-				path="intermediate_data/estimated_expression_20201007/logs",
-				pattern="*log") %>%
-		data.frame(log_fname=., stringsAsFactors=FALSE))
+log_files <- tibble::tibble(
+		log_dir = c(
+				"intermediate_data/estimated_expression/logs",
+				"intermediate_data/estimated_expression_180611/logs",
+				"intermediate_data/estimated_expression_20201007/logs")) %>%
+		dplyr::rowwise() %>%
+		dplyr::do({
+				list.files(path = .$log_dir[1], pattern="*log", full.names=TRUE) %>%
+						tibble::tibble(log_fname= .)
+		}) %>%
+		dplyr::mutate(
+				run_accession = log_fname %>%
+						stringr::str_match("([^/]+)[.]log") %>%
+		        magrittr::extract(,2)) %>%
+		dplyr::inner_join(
+				ca_runs %>% dplyr::select(run_accession, is_paired),
+				by="run_accession")
 
 estimated_expression_meta <- log_files  %>%
-	dplyr::mutate(
-		run_accession = log_fname %>% stringr::str_extract("^[^.]+")) %>%
-	dplyr::left_join(
-		ca_runs %>% dplyr::select(run_accession, is_paired),
-		by="run_accession") %>%
 	plyr::adply(1, function(run){
 		log_fname <- run$log_fname[1]
 		cat("processing log file: ", log_fname, " ...\n", sep="")
-		lines <- readr::read_lines(
-			file=paste0("intermediate_data/estimated_expression/logs/", log_fname))
+		lines <- readr::read_lines(file=log_fname)
 		n_reads <- lines %>%
 			stringr::str_detect(" reads; of these:") %>%
 			magrittr::extract(lines, .) %>%
@@ -96,8 +94,9 @@ estimated_expression_meta <- log_files  %>%
 
 
 save(estimated_expression_meta, file="intermediate_data/estimated_expression_meta.Rdata")
+
 estimated_expression_meta %>%
-	readr::write_tsv("product/estimated_expression_meta_180621.tsv")
+	readr::write_tsv("product/estimated_expression_meta_20201007.tsv")
 
 
 
