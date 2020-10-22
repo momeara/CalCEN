@@ -18,20 +18,17 @@ tag <- "20201007"
 
 get_done_runs <- function(path, check_for_logs=TRUE){
 	cat("Getting done runs from '", path, "' ...\n", sep="")
-
 	done_run_results <- list.files(
 		path=path,
 		pattern="*.genes.results") %>%
 		stringr::str_extract("^[^.]+") %>%
 		tibble::tibble(run_accession = .)
-
 	if(check_for_logs){
 		done_run_logs <- list.files(
 			path=paste0(path, "/logs"),
 			pattern="*.log") %>%
 			stringr::str_extract("^[^.]+") %>%
 			tibble::tibble(run_accession = .)
-
 		done_runs <- done_run_results %>%
 				dplyr::inner_join(done_run_logs, by="run_accession")
 	} else{
@@ -47,7 +44,7 @@ done_runs <- rbind(
 # somehow the logs got lost for these so far
 done_runs <- get_done_runs(
 		paste0("intermediate_data/estimated_expression_", tag),
-		check_for_logs = FALSE)
+		check_for_logs = TRUE)
 
 todo_runs <- ca_runs %>%
 	dplyr::anti_join(
@@ -81,7 +78,6 @@ if(cluster_type == "SGE"){
 				cat("Creating job directory: ", job_dir, "\n", sep = "")
 				dir.create(job_dir, recursive = TRUE)
 		}
-
 		cmd_str <- paste0(
 				"sbatch ",
 				"--account=", slurm_account, " ",
