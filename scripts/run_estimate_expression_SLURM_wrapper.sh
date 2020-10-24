@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #SBATCH --job-name=estimate_ca_coexp_expression
 #SBATCH --cpus-per-task=1
 #SBATCH --nodes=1
