@@ -85,6 +85,7 @@ if(cluster_type == "SGE"){
 				"--mail-type=BEGIN,END,FAIL ",
 				"--array=1-", n_jobs, " ",
 				"--output='", job_dir, "/%j.log' ",
+				"--time=03:00:00 ",
 				"--export=",
 				  "TAG='", tag, "',",
 				  "BASE_DIR='", base_dir, "',",
