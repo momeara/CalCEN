@@ -5,8 +5,8 @@ library(plyr)
 library(dplyr)
 library(tidyr)
 library(tibble)
-library(seriation)
-library(gplots)
+
+source("scripts/seriation_heatmap.R")
 
 load("intermediate_data/chromosome_features.Rdata")
 load("intermediate_data/ca_silac_hsp90_intensities.Rdata")
@@ -14,48 +14,6 @@ load("intermediate_data/ca_silac_hsp90_fold_change.Rdata")
 
 load("intermediate_data/genes_of_interest.Rdata")
 
-#########
-# given a matrix x,
-# This makes a dendrogram where the columns are sorted to minimize the row-to-row difference
-# the sorting is done relative to the ref_x, if it is supplied
-silac_heatmap <- function (
-	x,
-	ref_x=x,
-	fname=NULL,
-	height=180,
-	width=15)
-{
-	if(!is.null(ref_x)){
-		dist_row <- dist(ref_x)
-		o_row <- seriate(dist_row, method = "OLO", control = NULL)[[1]]
-		Rowv=as.dendrogram(o_row)
-	} else {
-		Rowv = FALSE
-	}
-	args <- list()
-  if (any(x < 0, na.rm = TRUE)){
-		args$col <- seriation::bluered(n=100, bias=1)
-	} else {
-		args$col <- seriation::greys(n=100, power=1)
-	}
-	args$trace <- "none"
-	args$density.info <- "none"
-	args$cexRow <- 1
-	args$cexCol <- 1
-	args$dendrogram="none"
-	args$key = FALSE
-	args$keysize = 0.03
-	args$colsep = seq(0, ncol(x), by=5000000)
-	args$rowsep = seq(0, nrow(x), by=5000000)
-	#args$sepwidth = c(0.02, 0.02)
-	args$sepwidth = c(0, 0)
-	args$margins = c(3,7)
-	args <- c(list(x = x, Colv = FALSE, Rowv = Rowv), args)
-	cat("plotting '", fname, "'...\n", sep="")
-	pdf(fname, height=height, width=width)
-		suppressWarnings(ret <- do.call(gplots::heatmap.2, args))
-	dev.off()
-}
 
 
 ### WT Intensities ###
@@ -68,7 +26,7 @@ wt_data <- ca_silac_hsp90_intensities %>%
 	tibble::column_to_rownames("gene_label") %>%
 	as.matrix()
 
-silac_heatmap(
+seriation_heatmap(
 	x=wt_data,
 	fname="product/figures/silac_hsp90_intensities_wildtype_heatmap_190219.pdf")
 
@@ -86,7 +44,7 @@ wt_data <- ca_silac_hsp90_intensities %>%
 	tibble::column_to_rownames("gene_label") %>%
 	as.matrix()
 
-silac_heatmap(
+seriation_heatmap(
 	x=wt_data,
 	fname="product/figures/silac_hsp90_normed_intensities_wildtype_heatmap_190219.pdf")
 
@@ -100,7 +58,7 @@ ph_fc_data <- ca_silac_hsp90_fold_change %>%
 	tibble::column_to_rownames("gene_label") %>%
 	as.matrix()
 
-silac_heatmap(
+seriation_heatmap(
 	x=ph_fc_data,
 	ref_x=wt_data,
 	fname="product/figures/silac_hsp90_fold_change_pharmacolical_heatmap_190219.pdf")
@@ -111,7 +69,7 @@ gt_fc_data <- ca_silac_hsp90_fold_change %>%
 	tibble::column_to_rownames("gene_label") %>%
 	as.matrix()
 
-silac_heatmap(
+seriation_heatmap(
 	x=gt_fc_data,
 	ref_x=wt_data,
 	fname="product/figures/silac_hsp90_fold_change_genetic_heatmap_190219.pdf")
@@ -149,13 +107,13 @@ gt_fc_data <- ca_silac_hsp90_fold_change %>%
 
 
 
-silac_heatmap(
+seriation_heatmap(
 	x=wt_data,
 	width=15,
 	height=180,
 	fname="product/figures/silac_hsp90_normed_intensities_wildtype_heatmap_190219.pdf")
 
-silac_heatmap(
+seriation_heatmap(
 	x=ph_fc_data,
 	ref_x=wt_data,
 	width=15,
@@ -163,7 +121,7 @@ silac_heatmap(
 	fname="product/figures/silac_hsp90_normed_fold_change_pharmacolical_heatmap_190219.pdf")
 
 
-silac_heatmap(
+seriation_heatmap(
 	x=gt_fc_data,
 	ref_x=wt_data,
 	width=15,
@@ -174,7 +132,7 @@ silac_heatmap(
 
 ### Combined WT/HSP90 depletion fold changes for figure 1 ###
 
-silac_heatmap(
+seriation_heatmap(
 	x=wt_data,
 	width=15,
 	height=40,
@@ -183,14 +141,14 @@ silac_heatmap(
 
 data <- cbind(ph_fc_data, gt_fc_data)
 data <- log(1 + abs(data))*sign(data)
-silac_heatmap(
+seriation_heatmap(
 	x=data,
 	ref_x=wt_data,
 	width=30,
 	height=40,
 	fname="product/figures/silac_hsp90_fig1_genetic_pharmacolical_fold_change_heatmap_180808.pdf")
 
-silac_heatmap(
+seriation_heatmap(
 		x=matrix(c(
 			-1, -.75, -.5, -.25, 0, .25, .5, .75, 1,
 			-1, -.75, -.5, -.25, 0, .25, .5, .75, 1,
@@ -212,7 +170,7 @@ silac_heatmap(
 		fname="product/figures/silac_normed_fc_legend.pdf")
 
 
-silac_heatmap(
+seriation_heatmap(
 		x=matrix(c(
 			0, 0.125, .25, 0.375, .5, 0.625, .75, 0.875, 1,
 			0, 0.125, .25, 0.375, .5, 0.625, .75, 0.875, 1,
@@ -265,7 +223,7 @@ genes_of_interest %>%
 		tibble::column_to_rownames("gene_label") %>%
 		as.matrix()
 	print(ph_fc_data)
-	silac_heatmap(
+	seriation_heatmap(
 		x=ph_fc_data,
 		ref_x=NULL,
 		fname=paste0("product/figures/silac_hsp90_fold_change_pharmacolical_heatmap_", set_id, "_190304.pdf"),
@@ -292,7 +250,7 @@ genes_of_interest %>%
 		tidyr::spread(fraction_index, normed_genetic_log_fc) %>%
 		tibble::column_to_rownames("gene_label") %>%
 		as.matrix()
-	silac_heatmap(
+	seriation_heatmap(
 		x=gt_fc_data,
 		ref_x=NULL,
 		fname=paste0("product/figures/silac_hsp90_fold_change_genetic_heatmap_", set_id, "_190304.pdf"),
