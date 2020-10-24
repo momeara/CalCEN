@@ -9,15 +9,17 @@ library(readr)
 library(reshape2)
 library(EGAD)
 
+load("intermediate_data/ca_runs_final.Rdata")
 load("intermediate_data/chromosome_features.Rdata")
 load("intermediate_data/estimated_expression.Rdata")
 load("intermediate_data/ca_genes.Rdata")
 
 exprs <- reshape2::acast(
-	data=estimated_expression,
-	formula=gene_id ~ run_accession,
-	value.var="FPKM") %>%
-	magrittr::extract(ca_genes,)
+		data=estimated_expression %>%
+				dplyr::semi_join(ca_runs_final, by=c("run_accession")),
+		formula=gene_id ~ run_accession,
+		value.var="FPKM") %>%
+		magrittr::extract(ca_genes,)
 
 ca_coexp_network_full <- EGAD::build_coexp_network(
 	exprs=exprs,
