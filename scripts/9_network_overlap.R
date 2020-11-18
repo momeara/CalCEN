@@ -6,7 +6,8 @@ library(dplyr)
 library(UpSetR)
 
 load("intermediate_data/chromosome_features.Rdata")
-load("intermediate_data/estiamted_expression.Rdata")
+load("intermediate_data/estimated_expression.Rdata")
+load("intermediate_data/ca_coexp.Rdata")
 load("intermediate_data/ca_blastp.Rdata")
 load("intermediate_data/ca_biogrid.Rdata")
 load("intermediate_data/sac_biogrid.Rdata")
@@ -23,8 +24,20 @@ load("intermediate_data/yeast_net_LC.Rdata")
 load("intermediate_data/yeast_net_PG.Rdata")
 load("intermediate_data/yeast_net_TS.Rdata")
 
-
 load("intermediate_data/ca_go_propagated_filtered.Rdata")
+
+
+
+
+ca_coexp_1p <- ca_coexp %>%
+		dplyr::filter(
+				feature_name_1 != feature_name_2,
+				score >= .99)
+
+ca_blastp_5E <- ca_blastp %>%
+		dplyr::filter(
+				feature_name_1 != feature_name_2,
+				EValue <= 1e-5)
 
 sac_ortholog_ppi <- sac_biogrid %>%
 	dplyr::select(
@@ -42,15 +55,14 @@ sac_ortholog_ppi <- sac_biogrid %>%
 			dplyr::select(feature_name_2=feature_name, sac_ortholog_2 = sac_ortholog),
 		by="sac_ortholog_2")
 
-
 network_overlap_plot <- function() {
 	list(
 		`Co-Exp` = c(
-			ca_coexp$feature_name_1 %>% unique,
-			ca_coexp$feature_name_2 %>% unique) %>% unique,
+			ca_coexp_1p$feature_name_1 %>% unique,
+			ca_coexp_1p$feature_name_2 %>% unique) %>% unique,
 		`BlastP` = c(
-			ca_blastp$feature_name_1,
-			ca_blastp$feature_name_2) %>% unique,
+			ca_blastp_5E$feature_name_1,
+			ca_blastp_5E$feature_name_2) %>% unique,
 		`PPI` = c(
 			ca_biogrid$feature_name_1,
 			ca_biogrid$feature_name_2) %>% unique,
@@ -113,13 +125,13 @@ network_overlap_plot <- function() {
 }
 
 pdf(
-	file="product/figures/network_overlap_180701.pdf",
+	file="product/figures/network_overlap_20201118.pdf",
 	width=9, height=5, useDingbats=FALSE, onefile=FALSE)
 network_overlap_plot()
 dev.off()
 
 png(
-	file="product/figures/network_overlap.png",
+	file="product/figures/network_overlap_20201118.png",
 	width=360*4, height=360*4, res=72*4)
 network_overlap_plot()
 dev.off()
