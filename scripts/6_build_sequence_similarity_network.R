@@ -14,7 +14,8 @@ ca_blastp_network <- ca_blastp %>%
 	EGAD::build_weighted_network(ca_genes)
 
 save(ca_blastp_network, file="intermediate_data/ca_blastp_network.Rdata")
+
 ca_blastp_network %>%
 	as.data.frame() %>%
-	readr::write_tsv("product/ca_blastp_network_180621.Rdata")
+	readr::write_tsv("product/ca_blastp_network_20201113.Rdata")
 

@@ -13,6 +13,8 @@ Depends:
     R (>= 3.6.0)
 biocViews:
 Imports:
+    argparser (>= 0.6),
+    intervals (>= 0.15.2),
     optparse (>= 1.6.6),
     scales (>= 1.0.0),
     tidyr (>= 1.0.0.9000),
@@ -27,7 +29,10 @@ Imports:
     SRAdb (>= 1.50.0),
     geomedb (>= 2.0.1),
     seqinr (>= 4.2-4),
-    EGAD (>= 1.16.0),    
+    EGAD (>= 1.16.0),
+    Hotelling (>= 1.0-5),
+    huge (>= 1.3.4.1),
+    GO.db (>= 3.11.4)
 Collage: 
 RoxygenNote: 7.1.0
 Encoding: UTF-8

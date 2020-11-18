@@ -163,6 +163,116 @@ report <- ca_coexp %>%
 	dplyr::select(-score) %>%
 	gene_gene_report()
 
-
 report %>%
 	readr::write_tsv("product/ERG11_gene_gene_report_20201015.tsv")
+
+report <- ca_coexp %>%
+	dplyr::filter(feature_name_1 == "C3_06660C_A") %>%
+	dplyr::filter(feature_name_2 != feature_name_1) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::select(-score) %>%
+	gene_gene_report()
+
+report %>%
+	readr::write_tsv("product/C3_06660C_A_gene_gene_report_20201027.tsv")
+
+
+####################
+#
+grace_null_goterm <- ca_coexp %>%
+		dplyr::semi_join(
+				readr::read_csv("raw_data/GRACE_NULLGOTERM.csv"),
+				by = c("feature_name_1" = "Gene ID")) %>%
+		dplyr::filter(feature_name_1 != feature_name_2) %>%
+		dplyr::arrange(desc(score)) %>%
+		dplyr::group_by(feature_name_1) %>%
+		dplyr::slice(1:50) %>%
+		dplyr::ungroup() %>%
+		dplyr::select(-score) %>%
+		gene_gene_report()
+
+grace_null_goterm %>%
+		readr::write_tsv("product/grace_null_goterm_gene_gene_report_20201101.tsv")
+
+
+# hsp90
+report <- ca_coexp %>%
+	dplyr::filter(feature_name_1 == "C7_02030W_A") %>%
+	dplyr::filter(feature_name_2 != feature_name_1) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::select(-score) %>%
+	gene_gene_report()
+
+report %>%
+	readr::write_tsv("product/C7_02030W_A_HSP90_gene_gene_report_20201027.tsv")
+
+## cell wall
+grace_null_goterm <- ca_coexp %>%
+		dplyr::semi_join(
+				readr::read_csv("raw_data/cellwall_20201105.csv"),
+				by = c("feature_name_1" = "Gene ID")) %>%
+		dplyr::filter(feature_name_1 != feature_name_2) %>%
+		dplyr::arrange(desc(score)) %>%
+		dplyr::group_by(feature_name_1) %>%
+		dplyr::slice(1:50) %>%
+		dplyr::ungroup() %>%
+		dplyr::select(-score) %>%
+		gene_gene_report()
+
+grace_null_goterm %>%
+		readr::write_tsv("product/cellwall_gene_gene_report_20201105.tsv")
+
+# CR_06140W_A
+report <- ca_coexp %>%
+	dplyr::filter(feature_name_1 == "CR_06140W_A") %>%
+	dplyr::filter(feature_name_2 != feature_name_1) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::select(-score) %>%
+	gene_gene_report()
+
+report %>%
+	readr::write_tsv("product/CR_06140W_A_gene_gene_report_20201112.tsv")
+
+
+# C1_14340C_A
+report <- ca_coexp %>%
+	dplyr::filter(feature_name_1 == "C1_14340C_A") %>%
+	dplyr::filter(feature_name_2 != feature_name_1) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::select(-score) %>%
+	gene_gene_report()
+
+report %>%
+	readr::write_tsv("product/C1_14340C_A_gene_gene_report_20201112.tsv")
+
+
+# DnaJ from SAC:
+sac_dnaj <- tibble::tibble(sac_ortholog = c(
+		"YDJ1", "XDJ1", "APJ1", "SIS1", "DJP1",
+		"ZUO1", "SWA2", "JJJ1", "JJJ2", "JJJ3",
+		"CAJ1", "CWC23", "MDJ1", "MDJ2", "PAM18",
+		"JAC1", "JID1", "SCJ1", "HLJ1", "JEM1",
+		"SEC63", "ERJ5"))
+candida_dnaj <- 	sac_dnaj %>%
+		dplyr::left_join(
+				chromosome_features,
+				by = "sac_ortholog")
+
+
+report <- ca_coexp %>%
+		dplyr::semi_join(
+		    candida_dnaj %>% dplyr::filter(!is.na(feature_name)),
+				by = c("feature_name_1" = "feature_name")) %>%
+		dplyr::filter(feature_name_1 != feature_name_2) %>%
+		dplyr::arrange(desc(score)) %>%
+		dplyr::group_by(feature_name_1) %>%
+		dplyr::slice(1:50) %>%
+		dplyr::ungroup() %>%
+		dplyr::select(-score) %>%
+		gene_gene_report()
+report %>%
+	readr::write_tsv("product/dnaj_gene_gene_report_20201114.tsv")
