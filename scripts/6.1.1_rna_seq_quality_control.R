@@ -16,6 +16,9 @@ ca_runs <- dplyr::bind_rows(
 load("intermediate_data/estimated_expression.Rdata")
 load("intermediate_data/estimated_expression_meta.Rdata")
 
+#####################################
+# check that all runs have metadata #
+#####################################
 run_progress <- ca_runs %>%
 		dplyr::count(year_collected, study_accession, name="sra_runs_per_study") %>%
 		dplyr::filter(sra_runs_per_study >= 20) %>%
@@ -33,23 +36,19 @@ run_progress <- ca_runs %>%
 				dplyr::mutate(got_meta = TRUE),
 				by = c("run_accession"))
 
-# which runs do we have but for which we're missing the meta info
 run_progress %>%
 		dplyr::filter(got_expression, is.na(got_meta))
 
 
-
+###########################################################
+# Filter runs by number of genes with non-zero expression #
+###########################################################
 
 n_zero_genes <- estimated_expression %>%
 		dplyr::group_by(study_accession, run_accession) %>%
 		dplyr::summarize(
 				n_nonzero_expression = sum(FPKM != 0),
 				.groups = "drop")
-
-
-
-
-
 
 ca_runs_final <- ca_runs %>%
 		dplyr::semi_join(
@@ -62,10 +61,10 @@ ca_runs_final <- ca_runs %>%
 				dplyr::filter(n_nonzero_expression >= 3113), # half the genes
 				by = c("study_accession", "run_accession"))
 
+save(ca_runs_final, file="intermediate_data/ca_runs_final.Rdata")
+
 ca_runs_final %>%
-		save(file="intermediate_data/ca_runs_final.Rdata")
-ca_runs_final %>%
-		save(file="product/ca_runs_20201024.tsv")
+		readr::write_tsv("product/ca_runs_20201024.tsv")
 
 
 
