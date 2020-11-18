@@ -9,7 +9,7 @@ library(stringr)
 library(ggplot2)
 
 gba_summary <- readr::read_tsv(
-	file="product/gba_summary_10f_C-B-SP-SG-YN_180706.tsv",
+	file="product/gba_summary_10f_C-B-SP-SG-YN_20201113.tsv",
 	col_types=readr::cols(
 	  anno_id = readr::col_character(),
 	  network_id = readr::col_character(),
@@ -144,10 +144,11 @@ sets_1hot <- auroc_data %>%
 #			data=auroc_data %>% dplyr::filter(anno_id == 'all'),
 #			aes(x=set_id, y=auroc_mean, group=degree),
 #			size=1.5) +
-##		geom_errorbar(
-##			data=auroc_data %>% dplyr::filter(anno_id == 'all'),
-##			aes(x=set_id, ymin=auroc_mean-auroc_std, ymax=auroc_mean+auroc_std),
-##			size=.2) +
+		geom_errorbar(
+			data=auroc_data %>% dplyr::filter(anno_id == 'all'),
+			aes(x=set_id, ymin=auroc_mean-auroc_std/sqrt(10), ymax=auroc_mean+auroc_std/sqrt(10)),
+			width = .05,
+			size=.2) +
 		geom_point(
 			data=auroc_data %>% dplyr::filter(anno_id == 'all'),
 			aes(x=set_id, y=auroc_mean),
@@ -215,12 +216,12 @@ p <- gridExtra::grid.arrange(
 	ncol=1)
 
 ggsave(
-	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_YN_18070706.pdf",
+	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_YN_20201117.pdf",
 	plot=p,
 	width=7.5, height=5,
 	useDingbats=FALSE)
 
 ggsave(
-	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_YN_18070706.png",
+	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_Y20201117.png",
 	plot=p,
 	width=7.5, height=5)

@@ -14,6 +14,8 @@ seriation_heatmap <- function (
     height = 180,
     width = 15,
     color_scale = NULL,
+    seriate_method = "OLO",
+    seriate_control = NULL,
     verbose = FALSE){
     if(!is.null(ref_x)){
         if(verbose){
@@ -28,6 +30,7 @@ seriation_heatmap <- function (
                 cat("ERROR: the size of the provided ref_x is ", attr(ref_x, "Size"), " while nrow(x)=", nrow(x), "\n", sep = "")
             }
             dist_row <- ref_x
+            dist_col <- t(ref_x)
         } else {
             if(verbose){
                 cat("Computing euclidian distances between ref_x rows ...\n")
@@ -36,11 +39,18 @@ seriation_heatmap <- function (
                 cat("ERROR: nrow(ref_x) = ", nrow(ref_x), " !=  nrow(x) = ", nrow(x), "\n", sep = "")
             }
             dist_row <- dist(ref_x)
+            dist_col <- dist(t(ref_x))
         }
-        o_row <- seriate(dist_row, method = "OLO", control = NULL)[[1]]
-        Rowv=as.dendrogram(o_row)
+        if(verbose){
+            cat("Computing seriation with method '", seriate_method, "'\n", sep="")
+        }
+        o_row <- seriate(dist_row, method = seriate_method, control = seriate_control)[[1]]
+        Rowv <- o_row %>% seriation::get_order()
+        o_col <- seriate(dist_col, method = seriate_method, control = seriate_control)[[1]]
+        Colv <- o_col %>% seriation::get_order()
     } else {
-        Rowv = FALSE
+        Rowv <- FALSE
+        Colv <- FALSE 
     }
     args <- list()
     if(is.null(color_scale)){
@@ -70,7 +80,8 @@ seriation_heatmap <- function (
     #args$sepwidth = c(0.02, 0.02)
     args$sepwidth = c(0, 0)
     args$margins = c(3,7)
-    args <- c(list(x = x, Colv = FALSE, Rowv = Rowv), args)
+    args$useRaster = TRUE
+    args <- c(list(x = x, Colv = Colv, Rowv = Rowv), args)
     cat("plotting '", fname, "'...\n", sep="")
     pdf(fname, height=height, width=width)
         suppressWarnings(ret <- do.call(gplots::heatmap.2, args))
