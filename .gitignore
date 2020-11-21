@@ -9,5 +9,6 @@ Rplots.pdf
 .Rbuildignore
 .RData
 .RDataTmp
+.future
 
 .httr-oauth
