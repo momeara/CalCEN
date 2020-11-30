@@ -262,6 +262,9 @@ candida_dnaj <- 	sac_dnaj %>%
 				chromosome_features,
 				by = "sac_ortholog")
 
+candida_dnaj %>%
+	readr::write_tsv("product/dnaj_sac_orthologs_20201114.tsv")
+
 
 report <- ca_coexp %>%
 		dplyr::semi_join(
@@ -276,3 +279,29 @@ report <- ca_coexp %>%
 		gene_gene_report()
 report %>%
 	readr::write_tsv("product/dnaj_gene_gene_report_20201114.tsv")
+
+
+# C2_01370C_A
+report <- ca_coexp %>%
+	dplyr::filter(feature_name_1 == "C2_01370C_A") %>%
+	dplyr::filter(feature_name_2 != feature_name_1) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::select(-score) %>%
+	gene_gene_report()
+
+report %>%
+	readr::write_tsv("product/C2_01370C_A_gene_gene_report_20201122.tsv")
+
+
+# C1_01800W_A
+report <- ca_coexp %>%
+	dplyr::filter(feature_name_1 == "C1_01800W_A") %>%
+	dplyr::filter(feature_name_2 != feature_name_1) %>%
+	dplyr::arrange(desc(score)) %>%
+	dplyr::slice(1:50) %>%
+	dplyr::select(-score) %>%
+	gene_gene_report()
+
+report %>%
+	readr::write_tsv("product/C1_01800W_A_gene_gene_report_20201122.tsv")

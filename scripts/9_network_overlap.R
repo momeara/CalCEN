@@ -13,16 +13,7 @@ load("intermediate_data/ca_biogrid.Rdata")
 load("intermediate_data/sac_biogrid.Rdata")
 
 
-load("intermediate_data/yeast_net.Rdata")
-load("intermediate_data/yeast_net_CC.Rdata")
-load("intermediate_data/yeast_net_CX.Rdata")
-load("intermediate_data/yeast_net_DC.Rdata")
-load("intermediate_data/yeast_net_GN.Rdata")
-load("intermediate_data/yeast_net_GT.Rdata")
-load("intermediate_data/yeast_net_HT.Rdata")
-load("intermediate_data/yeast_net_LC.Rdata")
-load("intermediate_data/yeast_net_PG.Rdata")
-load("intermediate_data/yeast_net_TS.Rdata")
+load("intermediate_data/yeast_net_network.Rdata")
 
 load("intermediate_data/ca_go_propagated_filtered.Rdata")
 
@@ -55,6 +46,16 @@ sac_ortholog_ppi <- sac_biogrid %>%
 			dplyr::select(feature_name_2=feature_name, sac_ortholog_2 = sac_ortholog),
 		by="sac_ortholog_2")
 
+yeast_net_long <- yeast_net_network %>%
+		as.data.frame() %>%
+		tibble::rownames_to_column(var = "feature_name_1") %>%
+		tidyr::pivot_longer(
+				cols=-feature_name_1,
+				names_to = "feature_name_2",
+				values_to = "score") %>%
+		dplyr::filter(score > 0)
+
+
 network_overlap_plot <- function() {
 	list(
 		`Co-Exp` = c(
@@ -66,7 +67,7 @@ network_overlap_plot <- function() {
 		`PPI` = c(
 			ca_biogrid$feature_name_1,
 			ca_biogrid$feature_name_2) %>% unique,
-		`Sac Genetic PPI` = c(
+		`SacGene` = c(
 			sac_ortholog_ppi %>%
 				dplyr::filter(experimental_system_type == "genetic") %>%
 				magrittr::extract2("feature_name_1") %>%
@@ -75,7 +76,7 @@ network_overlap_plot <- function() {
 				dplyr::filter(experimental_system_type == "genetic") %>%
 				magrittr::extract2("feature_name_2") %>%
 				unique) %>% unique,
-		`Sac Physical PPI` = c(
+		`SacPhys` = c(
 			sac_ortholog_ppi %>%
 				dplyr::filter(experimental_system_type == "physical") %>%
 				magrittr::extract2("feature_name_1") %>%
@@ -85,53 +86,33 @@ network_overlap_plot <- function() {
 				magrittr::extract2("feature_name_2") %>%
 				unique) %>% unique,
 		`YeastNet` = c(
-			yeast_net$feature_name_1,
-			yeast_net$feature_name_2) %>% unique,
-		`YeastNet-CC` = c(
-			yeast_net_CC$feature_name_1,
-			yeast_net_CC$feature_name_2) %>% unique,
-		`YeastNet-CX` = c(
-			yeast_net_CX$feature_name_1,
-			yeast_net_CX$feature_name_2) %>% unique,
-		`YeastNet-DC` = c(
-			yeast_net_DC$feature_name_1,
-			yeast_net_DC$feature_name_2) %>% unique,
-		`YeastNet-GN` = c(
-			yeast_net_GN$feature_name_1,
-			yeast_net_GN$feature_name_2) %>% unique,
-		`YeastNet-GT` = c(
-			yeast_net_GT$feature_name_1,
-			yeast_net_GT$feature_name_2) %>% unique,
-		`YeastNet-HT` = c(
-			yeast_net_HT$feature_name_1,
-			yeast_net_HT$feature_name_2) %>% unique,
-		`YeastNet-LC` = c(
-			yeast_net_LC$feature_name_1,
-			yeast_net_LC$feature_name_2) %>% unique,
-		`YeastNet-PG` = c(
-			yeast_net_PG$feature_name_1,
-			yeast_net_PG$feature_name_2) %>% unique,
-		`YeastNet-TS` = c(
-			yeast_net_TS$feature_name_1,
-			yeast_net_TS$feature_name_2) %>% unique,
-		`CGD GO` = ca_go_propagated_filtered$feature_name %>% unique) %>%
+			yeast_net_long$feature_name_1,
+			yeast_net_long$feature_name_2) %>% unique) %>%
+#		`CGD GO` = ca_go_propagated_filtered$feature_name %>% unique) %>%
 		UpSetR::fromList() %>%
-		UpSetR::upset(
-			keep.order=TRUE,
-			order.by="freq",
-			point.size=3.5,
-			mainbar.y.label="Candida Albicans Genes",
-			sets.x.label="Network Nodes")
+			UpSetR::upset(
+					sets = c(
+							"YeastNet",
+							"SacPhys",
+							"SacGene",
+							"Co-Exp",
+							"BlastP"),
+			keep.order = TRUE,
+			order.by = "freq",
+			point.size = 3.5,
+			set_size.show = FALSE,
+			mainbar.y.label = "Candida albicans genes",
+			sets.x.label = "Network Nodes")
 }
 
 pdf(
-	file="product/figures/network_overlap_20201118.pdf",
-	width=9, height=5, useDingbats=FALSE, onefile=FALSE)
+	file="product/figures/network_overlap_20201124.pdf",
+	width=6, height=5, useDingbats=FALSE, onefile=FALSE)
 network_overlap_plot()
 dev.off()
 
 png(
-	file="product/figures/network_overlap_20201118.png",
-	width=360*4, height=360*4, res=72*4)
+	file="product/figures/network_overlap_20201124.png",
+	width=2400*4, height=360*4, res=72*4)
 network_overlap_plot()
 dev.off()

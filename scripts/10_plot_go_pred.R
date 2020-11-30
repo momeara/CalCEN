@@ -9,7 +9,7 @@ library(stringr)
 library(ggplot2)
 
 gba_summary <- readr::read_tsv(
-	file="product/gba_summary_10f_C-B-SP-SG-YN_20201113.tsv",
+	file="product/gba_summary_10f_C-B-SP-SG-YN_20201124.tsv",
 	col_types=readr::cols(
 	  anno_id = readr::col_character(),
 	  network_id = readr::col_character(),
@@ -22,7 +22,7 @@ auroc_data <- gba_summary %>%
 	dplyr::mutate(value=1) %>%
 	tidyr::spread("networks", value, 0) %>%
 	dplyr::mutate(
-		degree = dplyr::select(., -anno_id, -network_id, -auroc_mean, -auroc_std) %>% rowSums()) %>%
+		degree = dplyr::select(., -anno_id, -network_id, -auroc_mean, -auroc_std, -degree_null_auroc_mean, -degree_null_auroc_std) %>% rowSums()) %>%
 	dplyr::arrange(degree, network_id) %>%
 	dplyr::group_by(anno_id) %>%
 	dplyr::mutate(set_id = row_number()) %>%
@@ -31,7 +31,7 @@ auroc_data <- gba_summary %>%
 
 sets_1hot <- auroc_data %>%
 	dplyr::distinct(set_id, .keep_all=TRUE) %>%
-	dplyr::select(-anno_id, -auroc_mean, -auroc_std, -network_id, -degree) %>%
+	dplyr::select(-anno_id, -auroc_mean, -auroc_std, -degree_null_auroc_mean, -degree_null_auroc_std, -network_id, -degree) %>%
 	as.data.frame() %>%
 	tibble::column_to_rownames("set_id") %>%
 	t
@@ -91,35 +91,43 @@ sets_1hot <- auroc_data %>%
 			ymax=y+0.5,
 			color=shade_color)
 
-	dots_plot <- ggplot() +
-		theme(
+	dots_plot <- ggplot2::ggplot() +
+		ggplot2::theme(
 			legend.position = c(0.5, 0.9),
 			legend.direction = "horizontal",
-			panel.background = element_rect(fill = "white"),
+			panel.background = ggplot2::element_rect(fill = "white"),
 	    plot.margin=unit(c(-0.2,0.5,-.5,0.5), "lines"),
-	    panel.grid.major.x = element_blank(),
-	    panel.grid.minor.x = element_blank(),
-	    panel.grid.major.y = element_line(colour="grey80", size=0.5),
-	    panel.grid.minor.y = element_line(colour="grey90", size=0.5),
-	    axis.text.x = element_blank(),
-	    axis.ticks.x = element_blank(),
-	    axis.ticks.y = element_blank(),
-	    axis.text.y = element_text(
+	    panel.grid.major.x = ggplot2::element_blank(),
+	    panel.grid.minor.x = ggplot2::element_blank(),
+	    panel.grid.major.y = ggplot2::element_line(colour="grey80", size=0.5),
+	    panel.grid.minor.y = ggplot2::element_line(colour="grey90", size=0.5),
+	    axis.text.x = ggplot2::element_blank(),
+	    axis.ticks.x = ggplot2::element_blank(),
+	    axis.ticks.y = ggplot2::element_blank(),
+	    axis.text.y = ggplot2::element_text(
 				colour = "gray0", size = 7*name_size_scale, hjust = 0.4),
-			axis.title.y = element_text(
+			axis.title.y = ggplot2::element_text(
 			  colour = "gray0", size = 8*name_size_scale,
 				margin = margin(t = 0, r = -40, b = 0, l = 0))) +
-			xlab(NULL) +
-			scale_y_continuous(
+			ggplot2::xlab(NULL) +
+			ggplot2::scale_y_continuous(
 				"Area Under the ROC Curve",
 				limits=c(0.5, 1)) +
-	    scale_x_continuous(
+	    ggplot2::scale_x_continuous(
 				limits=c(0, n_sets+1),
 				expand = c(0, 0)) +
-			scale_color_discrete("GO Ontology") +
-	    geom_rect(
+			ggplot2::scale_color_manual(
+					"GO Ontology",
+					values = c(
+							"all"="black",
+							"BP"="#F8766D",
+							"CC"="#00BA38",
+							"MF"="#619CFF",
+							"degree"="grey60"),
+					breaks = c("all", "BP", "CC", "MF", "degree")) +
+	    ggplot2::geom_rect(
 				data = upper_sets_shading_data,
-				aes(
+				ggplot2::aes(
 					xmin = xmin, xmax = xmax,
 	        ymin = ymin, ymax = ymax),
 	        fill = shade_color,
@@ -136,73 +144,79 @@ sets_1hot <- auroc_data %>%
 ##				ymax=auroc_mean+auroc_std,
 ##				color=anno_id),
 ##			size=.5) +
-		geom_point(
+		ggplot2::geom_point(
 			data=auroc_data %>% dplyr::filter(anno_id != 'all'),
-			aes(x=set_id, y=auroc_mean, color=anno_id),
+			ggplot2::aes(x=set_id, y=auroc_mean, color=anno_id),
 			size=2) +
 #		geom_line(
 #			data=auroc_data %>% dplyr::filter(anno_id == 'all'),
 #			aes(x=set_id, y=auroc_mean, group=degree),
 #			size=1.5) +
-		geom_errorbar(
+		ggplot2::geom_errorbar(
 			data=auroc_data %>% dplyr::filter(anno_id == 'all'),
-			aes(x=set_id, ymin=auroc_mean-auroc_std/sqrt(10), ymax=auroc_mean+auroc_std/sqrt(10)),
+			ggplot2::aes(x=set_id, ymin=auroc_mean-auroc_std/sqrt(10), ymax=auroc_mean+auroc_std/sqrt(10)),
 			width = .05,
 			size=.2) +
-		geom_point(
+		ggplot2::geom_point(
 			data=auroc_data %>% dplyr::filter(anno_id == 'all'),
-			aes(x=set_id, y=auroc_mean),
+			aes(x=set_id, y=auroc_mean, color=anno_id),
+			size=3) +
+		ggplot2::geom_point(
+				data=auroc_data %>%
+						dplyr::filter(anno_id == 'all') %>%
+			      dplyr::mutate(anno_id = "degree"),
+			aes(x=set_id, y=degree_null_auroc_mean, color=anno_id),
 			size=3)
 
 
-	sets_plot <- ggplot() +
+	sets_plot <- ggplot2::ggplot() +
 		theme(
-			panel.background = element_rect(fill = "white"),
+			panel.background = ggplot2::element_rect(fill = "white"),
 	    plot.margin=unit(c(-0.5,0.5,0.5,0.5), "lines"),
-	    axis.text.x = element_blank(),
-	    axis.ticks.x = element_blank(),
-	    axis.ticks.y = element_blank(),
-	    axis.text.y = element_text(
+	    axis.text.x = ggplot2::element_blank(),
+	    axis.ticks.x = ggplot2::element_blank(),
+	    axis.ticks.y = ggplot2::element_blank(),
+	    axis.text.y = ggplot2::element_text(
 				colour = "gray0", size = 7*name_size_scale, hjust = 1),
-	    panel.grid.major = element_blank(),
-	    panel.grid.minor = element_blank()) +
-			xlab(NULL) + ylab("   ") +
-	    scale_y_continuous(
+	    panel.grid.major = ggplot2::element_blank(),
+	    panel.grid.minor = ggplot2::element_blank()) +
+			ggplot2::xlab(NULL) + ggplot2::ylab("   ") +
+	    ggplot2::scale_y_continuous(
 				breaks = c(1:n_items),
 	      limits = c(0.5, n_items+0.5),
 	      labels = rownames(sets_1hot),
 				expand = c(0,0)) +
-	    scale_x_continuous(
+	    ggplot2::scale_x_continuous(
 				limits = c(0, n_sets+1),
 				expand = c(0, 0)) +
-	    geom_rect(
+	    ggplot2::geom_rect(
 				data = item_shading_data,
-				aes(
+				ggplot2::aes(
 					xmin = xmin, xmax = xmax,
 	        ymin = ymin, ymax = ymax),
 	        fill = shade_color,
 					alpha = shade_alpha) +
-	    geom_rect(
+	    ggplot2::geom_rect(
 				data = lower_sets_shading_data,
-				aes(
+				ggplot2::aes(
 					xmin = xmin, xmax = xmax,
 	        ymin = ymin, ymax = ymax),
 	        fill = shade_color,
 					alpha = shade_alpha) +
-	    geom_point(
+	    ggplot2::geom_point(
 				data=sets_data,
-				aes(x=x, y=y),
+				ggplot2::aes(x=x, y=y),
 				colour = sets_data$color,
 	      size= point_size,
 				alpha = sets_data$alpha,
 				shape=16) +
-			geom_line(
+			ggplot2::geom_line(
 				data= sets_data,
-				aes(x=x, y=y,
+				ggplot2::aes(x=x, y=y,
 					group = intersection,
 	        colour=color),
 				size = line_size) +
-	    scale_color_identity()
+	    ggplot2::scale_color_identity()
 
 dots_plot <- dots_plot %>% ggplotGrob
 sets_plot <- sets_plot %>% ggplotGrob
@@ -216,12 +230,12 @@ p <- gridExtra::grid.arrange(
 	ncol=1)
 
 ggsave(
-	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_YN_20201117.pdf",
+	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_YN_20201124.pdf",
 	plot=p,
 	width=7.5, height=5,
 	useDingbats=FALSE)
 
 ggsave(
-	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_Y20201117.png",
+	file="product/figures/go_pred_SubO_10f_C-B-SP-SG_YN_20201124.png",
 	plot=p,
 	width=7.5, height=5)

@@ -28,7 +28,7 @@ make_plot <- function(genes_of_interest){
 		UpSetR::upset(
 			keep.order=TRUE,
 			point.size=3.5,
-			mainbar.y.label="Candida Albicans Genes",
+			mainbar.y.label="Candida albicans Genes",
 			sets.x.label="Evidence Source")
 }
 

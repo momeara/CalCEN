@@ -15,6 +15,7 @@ source("scripts/evaluate_network_gba.R")
 load("product/ca_coexp_network_full_20201007.Rdata")
 
 load("intermediate_data/ca_blastp_network.Rdata")
+load("intermediate_data/ca_blastp_rank_network_20201124.Rdata")
 load("intermediate_data/ca_ppi_network.Rdata")
 load("intermediate_data/ca_silac_network.Rdata")
 
@@ -40,6 +41,15 @@ load("intermediate_data/chromosome_features.Rdata")
 load("intermediate_data/ca_go_annotations.Rdata")
 load("intermediate_data/ca_go_annotations_by_subontology.Rdata")
 load("intermediate_data/ca_go_annotations_by_evidence.Rdata")
+
+# Walk through of run_GBA to refresh my memory about how the cross-validation works
+# EGAD::run_GBA(ca_coexp_network_full, ca_go_annotations)
+#    after filtering: n_genes = 4480 n_terms = 361
+#    neighbor_voting([n_genes,n_genes], [n_genes,n_terms])
+#       l = 361, g = 4480, n = 26,448
+#       test.genes.labels = [n_genes, 3*n_terms]
+#       for each term j
+#           clear the annotation 1/nFold annotations from each fold in test.genes.labels
 
 
 go_pred <- list(
@@ -82,7 +92,7 @@ gba_summary <- evaluate_network_gba(
 	annotation_sets=ca_go_annotations_by_subontology,
 	networks = list(
 		`Co-Exp` = ca_coexp_network_full,
-		BlastP = ca_blastp_network,
+		BlastP = log(ca_blastp_network + 1),
 		SacPhys = ca_sac_ortholog_physical_ppi_network,
 		SacGene = ca_sac_ortholog_genetic_ppi_network))
 save(gba_summary, file="intermediate_data/gba_summary_full.Rdata")
@@ -94,12 +104,12 @@ gba_summary <- evaluate_network_gba(
 	annotation_sets=ca_go_annotations_by_subontology,
 	networks = list(
 		`Co-Exp` = ca_coexp_network_full,
-		BlastP = ca_blastp_network,
+		BlastP = ca_blastp_rank_network,
 		SacPhys = ca_sac_ortholog_physical_ppi_network,
 		SacGene = ca_sac_ortholog_genetic_ppi_network,
 		YeastNet = yeast_net_network),
-	nfold=10)
-gba_summary %>% readr::write_tsv("product/gba_summary_10f_C-B-SP-SG-YN_20201113.tsv")
+	nfold=3)
+gba_summary %>% readr::write_tsv("product/gba_summary_10f_C-B-SP-SG-YN_20201124.tsv")
 
 source("scripts/evaluate_network_gba.R")
 gba_summary <- evaluate_network_gba(
@@ -113,4 +123,3 @@ gba_summary <- evaluate_network_gba(
 		YeastNet = yeast_net_network),
 	nfold=10)
 gba_summary %>% readr::write_tsv("product/gba_summary_byE_10f_C-B-SP-SG-YN_20201113.tsv")
-

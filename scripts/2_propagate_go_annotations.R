@@ -53,7 +53,10 @@ save(
 	ca_go_propagated_filtered,
 	file="intermediate_data/ca_go_propagated_filtered.Rdata")
 
-
+# warning by filtering out NOT qualifiers some terms have less than 20 annotations
+# default EGAD::run_GBA re-filters for terms with min=20 max=1000, so some terms
+# will be excluded when the analysis is run.
+# FIXME: move this filter before ca_go_propagated_filtered is computed
 ca_go_positive <-  ca_go_propagated_filtered %>%
 	dplyr::filter(is.na(qualifier) || qualifier != "NOT") %>%
 	dplyr::distinct(feature_name, go_id, .keep_all=TRUE)

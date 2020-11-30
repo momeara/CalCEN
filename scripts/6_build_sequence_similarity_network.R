@@ -19,3 +19,14 @@ ca_blastp_network %>%
 	as.data.frame() %>%
 	readr::write_tsv("product/ca_blastp_network_20201113.Rdata")
 
+
+ca_blastp_rank_network <- ca_blastp %>%
+		dplyr::mutate(
+				rank_score = rank(bit_score, na.last = "keep", ties.method = "average") / dplyr::n()) %>%
+		dplyr::select(feature_name_1, feature_name_2, rank_score) %>%
+		as.data.frame() %>%
+		EGAD::build_weighted_network(ca_genes)
+
+ca_blastp_network %>%
+	as.data.frame() %>%
+	readr::write_tsv("product/ca_blastp_rank_network_20201124.Rdata")

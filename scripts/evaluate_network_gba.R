@@ -81,7 +81,9 @@ evaluate_network_gba <- function(
 						anno_id=anno_id,
 						network_id=network_id,
 						auroc_mean = gba[[1]][,1] %>% mean(na.rm=TRUE),
-						auroc_std = gba[[1]][,1] %>% sd(na.rm=TRUE))
+						auroc_std = gba[[1]][,1] %>% sd(na.rm=TRUE),
+						degree_null_auroc_mean = gba[[1]][,3] %>% mean(na.rm=TRUE),
+						degree_null_auroc_std = gba[[1]][,3] %>% sd(na.rm=TRUE))
 				}, error=function(e){
 					cat("ERROR: ", e$message, "\n", sep = "")
 					tibble::tibble()
