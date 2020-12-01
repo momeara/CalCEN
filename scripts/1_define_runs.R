@@ -30,7 +30,9 @@ runs <- sra_con %>%
 		library_strategy == "RNA-Seq") %>%
 	dplyr::collect(n = Inf)
 
-
+# identify all RNA-seq datasets that have no taxon_id but
+# have the species name in the abstract. This may capture
+# for example co-culture experiments 
 runs2 <- sra_con %>%
 	dplyr::tbl("sra") %>%
 	dplyr::filter(
@@ -41,7 +43,7 @@ runs2 <- sra_con %>%
 runs_no_species <- sra_con %>%
 	dplyr::tbl("sra") %>%
 	dplyr::filter(
-		is.na(taxon_id),
+#		is.na(taxon_id),
 		library_strategy == "RNA-Seq") %>%
 	dplyr::collect(n = Inf)
 
@@ -125,15 +127,15 @@ studies <- runs %>%
 		dplyr::distinct(sample_accession) %>%
 		dplyr::summarize(n_samples = n())
 
-ca_coexp_datasets <- readr::read_tsv("raw_data/ca_coexp_datasets.tsv")
+CalCEN_datasets <- readr::read_tsv("raw_data/CalCEN_datasets.tsv")
 
 sra_con %>%
-		dplyr::copy_to(ca_coexp_datasets)
+		dplyr::copy_to(CalCEN_datasets)
 
 ca_runs <- sra_con %>%
 		dplyr::tbl("sra") %>%
 		dplyr::semi_join(
-				sra_con %>% dplyr::tbl("ca_coexp_datasets"),
+				sra_con %>% dplyr::tbl("CalCEN_datasets"),
 				by = "study_accession") %>%
 		dplyr::collect(n = Inf)
 

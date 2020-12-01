@@ -6,80 +6,32 @@ library(dplyr)
 library(stringr)
 library(readr)
 library(seriation)
+library(EGAD)
 
 source("scripts/seriation_heatmap.R")
 
 load("intermediate_data/ca_runs_final.Rdata")
 
 load("intermediate_data/estimated_expression.Rdata")
-load("product/ca_coexp_network_full_20201007.Rdata")
-date_code <- "20201110"
+load("product/CalCEN_network_full_20201007.Rdata")
 
-###########################
-# Plot expression heatmap #
-###########################
-estimated_expression <- estimated_expression %>%
-		dplyr::semi_join(ca_runs_final, by = c("run_accession"))
-
-exprs <- reshape2::acast(
-	data=estimated_expression,
-	formula=gene_id ~ run_accession,
-	value.var="FPKM")
-
-exprs <- log10(exprs+1)
-
-gene_slice <- 1:6226
-run_slice <- 1:853
-#ca_coexp_dist <- as.dist(exprs[gene_slice,run_slice])
-for(seriate_method in c("TSP", "OLO", "VAT")){
-  seriation_heatmap(
-  		x = exprs[gene_slice,run_slice],
-  		ref_x = exprs[gene_slice,run_slice],
-  		color_scale = seriation::greys(100, power = 1),
-  		fname = paste0(
-					"product/figures/test_heatmap_seriation_g=", length(gene_slice), ",r=",length(run_slice), "_method=", seriate_method,"_h=40.pdf"),
-  		height = 40,
-  		width = 6,
-			seriate_method = seriate_method,
-  		verbose = TRUE)
-	}
-
-ca_coexp_dist <- as.dist(1-ca_coexp_network_full[1:200, 1:200])
-
-seriation_heatmap(
-		x = 1-ca_coexp_network_full[1:200, 1:200],
-		ref_x = 1-ca_coexp_network_full[1:200, 1:200],
-		color_scale = seriation::greys(100, power = 2),
-		fname = paste0("product/figures/ca_coexp_heatmap_", date_code, ".pdf"),
-		height = 10,
-		width = 10,
-		verbose = TRUE)
-
-seriation_heatmap(
-		x = 1-ca_coexp_network_full[1:200, 1:200],
-		ref_x = 1-ca_coexp_network_full[1:200, 1:200],
-		color_scale = seriation::greys(100, power = 2),
-		fname = paste0("product/figures/ca_coexp_heatmap_raster_", date_code, ".png"),
-		height = 10,
-		width = 10,
-		verbose = TRUE)
-
-
+date_code <- "20201130"
 
 #############################
 # Plot co-expression matrix #
 #############################
 
-load("intermediate_data/ca_coexp.Rdata")
+load("intermediate_data/CalCEN.Rdata")
 
 ### OLO ##
 gene_order <- seriation::seriate(
-		x = dist(1-ca_coexp_network_full),
+		x = dist(1-CalCEN_network_full),
 		method = "OLO") %>%
 		seriation::get_order()
-heatmap <- as.raster(ca_coexp_network[gene_order, gene_order])
+
+heatmap <- as.raster(CalCEN_network_full[gene_order, gene_order])
 png(
-		"product/figures/ca_coexp_heatmap_raster1_20201112.png",
+		"product/figures/CalCEN_heatmap_raster1_20201130.png",
 		width = length(gene_order),
 		height = length(gene_order))
 plot.new()
@@ -94,14 +46,56 @@ dev.off()
 
 ### TSP ##
 gene_order <- seriation::seriate(
-		x = dist(1-ca_coexp_network_full),
+		x = dist(1-CalCEN_network_full),
 		method = "TSP") %>%
 		seriation::get_order()
 
-heatmap <- as.raster(ca_coexp_network_full[gene_order, gene_order])
+heatmap <- as.raster(CalCEN_network_full[gene_order, gene_order])
 png(
-		"product/figures/ca_coexp_heatmap_raster_TSP_20201112.png",
+		"product/figures/CalCEN_heatmap_raster_TSP_20201112.png",
 		width = length(gene_order),
+		height = length(gene_order))
+plot.new()
+rasterImage(
+		image = heatmap,
+		xleft = 0,
+		ybottom = 0,
+		xright = 1,
+		ytop = 1,
+		interpolate = FALSE)
+dev.off()
+
+###########################
+# Plot expression heatmap #
+###########################
+
+
+estimated_expression <- estimated_expression %>%
+		dplyr::semi_join(ca_runs_final, by = c("run_accession"))
+
+exprs <- reshape2::acast(
+	data=estimated_expression,
+	formula=gene_id ~ run_accession,
+	value.var="FPKM")
+
+exprs <- log(1+exprs)
+
+
+run_network <- EGAD::build_coexp_network(
+		exprs = exprs %>% t(),
+		gene.list = colnames(exprs))
+
+run_order <- seriation::seriate(
+		x = dist(1-run_network),
+		method = "OLO") %>%
+		seriation::get_order()
+
+exprs_log1p <- log(1+exprs)
+heatmap <- as.raster(exprs_log1p[gene_order, run_order]/max(exprs_log1p))
+
+png(
+		"product/figures/ca_expression_heatmap_raster_20201130.png",
+		width = length(run_order),
 		height = length(gene_order))
 plot.new()
 rasterImage(

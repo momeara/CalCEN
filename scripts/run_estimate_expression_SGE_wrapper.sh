@@ -24,7 +24,7 @@
 
 set -e 1
 
-PERSIST=/mnt/nfs/work/momeara/collaborations/ca_coexp
+PERSIST=/mnt/nfs/work/momeara/collaborations/CalCEN
 TAG=180611
 
 RUNS_FNAME=${PERSIST}/intermediate_data/todo_runs_180611.tsv

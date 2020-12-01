@@ -8,7 +8,7 @@ library(stringr)
 library(readr)
 
 load("intermediate_data/chromosome_features.Rdata")
-load("intermediate_data/ca_coexp.Rdata")
+load("intermediate_data/CalCEN.Rdata")
 load("intermediate_data/ca_blastp.Rdata")
 load("intermediate_data/ca_biogrid.Rdata")
 load("intermediate_data/sac_biogrid.Rdata")
@@ -41,7 +41,7 @@ gene_gene_report <- function(data){
 	# Co-Expression
 	report <- report %>%
 		dplyr::left_join(
-			ca_coexp %>% dplyr::rename(coexp_score = score),
+			CalCEN %>% dplyr::rename(coexp_score = score),
 			by=c("feature_name_1", "feature_name_2"))
 
 	# Sequence Similarity

@@ -1,14 +1,14 @@
-Package: ca_coexp
+Package: CalCEN
 Type: Package
-Version: 0.0.0.9000
+Version: 0.0.1.0000
 Title: Estimate Co-Expression for Candida albicans
 Description: Candida albicans is a pathogenic fungi. A Co-expression network
     is a gene-gene similarity netowrk, where similarity is measured by
     the correlation of the expression profiles across a range of RNAseq studies
 Authors@R: person("Matthew", "O'Meara", email = "maom@umich.edu",
     role = c("aut", "cre"))
-URL: http://github.com/momeara/ca_coexp
-BugReports: https://github.com/momeara/ca_coexp/issues
+URL: http://github.com/momeara/CalCEN
+BugReports: https://github.com/momeara/CalCEN/issues
 Depends:
     R (>= 3.6.0)
 biocViews:

@@ -4,9 +4,10 @@ library(plyr)
 library(tidyverse, quietly = TRUE, warn.conflicts = FALSE)
 library(monocle3, quietly = TRUE, warn.conflicts = FALSE)
 
+
 load("intermediate_data/ca_runs_final.Rdata")
 load("intermediate_data/estimated_expression.Rdata")
-load("product/ca_coexp_network_full_20201007.Rdata")
+load("product/CalCEN_network_full_20201007.Rdata")
 date_code <- "20201113"
 
 
@@ -73,13 +74,13 @@ coexp_cds %>%
         show_trajectory_graph = FALSE,
         cell_size = 0.8)
 
-if (! dir.exists(paths = "product/figures/ca_coexp_embedding")) {
-    cat("Creating 'product/figures/ca_coexp_embedding'\n", sep = "")
-    dir.create(path = "product/figures/ca_coexp_embedding", recursive = TRUE)
+if (! dir.exists(paths = "product/figures/CalCEN_embedding")) {
+    cat("Creating 'product/figures/CalCEN_embedding'\n", sep = "")
+    dir.create(path = "product/figures/CalCEN_embedding", recursive = TRUE)
 }
 
 ggplot2::ggsave(
-    filename = "product/figures/ca_coexp_embedding/UMAP_experiments_20201113.pdf",
+    filename = "product/figures/CalCEN_embedding/UMAP_experiments_20201113.pdf",
     width = 6,
     height = 6)
 
@@ -165,13 +166,13 @@ coexp_cds %>%
         show_trajectory_graph = FALSE,
         cell_size = 0.8)
 
-if (! dir.exists(paths = "product/figures/ca_coexp_embedding")) {
-    cat("Creating 'product/figures/ca_coexp_embedding'\n", sep = "")
-    dir.create(path = "product/figures/ca_coexp_embedding", recursive = TRUE)
+if (! dir.exists(paths = "product/figures/CalCEN_embedding")) {
+    cat("Creating 'product/figures/CalCEN_embedding'\n", sep = "")
+    dir.create(path = "product/figures/CalCEN_embedding", recursive = TRUE)
 }
 
 ggplot2::ggsave(
-    filename = "product/figures/ca_coexp_embedding/UMAP_genes_20201113.pdf",
+    filename = "product/figures/CalCEN_embedding/UMAP_genes_20201113.pdf",
     width = 6,
     height = 6)
 
@@ -187,5 +188,5 @@ gene_clusters <- gene_clusters %>%
         chromosome_features,
         by = "feature_name")
 
-gene_clusters %>% readr::write_tsv("product/figures/ca_coexp_embedding/UMAP_genes_cluster_labels_20201113.tsv")
+gene_clusters %>% readr::write_tsv("product/figures/CalCEN_embedding/UMAP_genes_cluster_labels_20201113.tsv")
 

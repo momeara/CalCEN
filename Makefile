@@ -44,7 +44,7 @@ install_prerequisites:
 	make install DESTDIR=${PREFIX} prefix=${PREFIX}
 	popd
 
-make ca_coexp:
+make CalCEN:
 	cp scripts/parameters_template.R parameters.R
 	Rscript scripts/1_define_runs.R
 	Rscript scripts/2_download_runs.R

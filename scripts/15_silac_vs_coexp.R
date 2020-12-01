@@ -12,7 +12,7 @@ library(ggplot2)
 load("intermediate_data/ca_silac_hsp90_intensities.Rdata")
 load("intermediate_data/ca_genes.Rdata")
 load("intermediate_data/ca_silac_network.Rdata")
-load("intermediate_data/ca_coexp_full.Rdata")
+load("intermediate_data/CalCEN_full.Rdata")
 
 
 spearman_rank_correlation <- function(netA, netB, n){
@@ -23,7 +23,7 @@ spearman_rank_correlation <- function(netA, netB, n){
 
 
 silac_genes <- ca_silac_network %>% rownames()
-coexp_genes <- ca_coexp_full %>%
+coexp_genes <- CalCEN_full %>%
 	dplyr::distinct(feature_name_1) %>%
 	magrittr::extract2("feature_name_1")
 genes <- intersect(silac_genes, coexp_genes)
@@ -31,14 +31,14 @@ genes <- intersect(silac_genes, coexp_genes)
 ca_silac_network <- ca_silac_network %>%
 	embed_network(genes)
 
-ca_coexp_network <- ca_coexp_full %>%
+CalCEN_network <- CalCEN_full %>%
 	dplyr::filter(feature_name_1 %in% genes) %>%
 	dplyr::filter(feature_name_2 %in% genes) %>%
 	reshape2::acast(feature_name_1 ~ feature_name_2, value.var="score") %>%
 	embed_network(genes)
 
 n <- length(genes) * length(genes)
-spearman_rank_correlation(ca_coexp_network, ca_silac_network, n)
+spearman_rank_correlation(CalCEN_network, ca_silac_network, n)
 
 
 

@@ -15,12 +15,12 @@ load("intermediate_data/go_pred.Rdata")
 # they may not be in sync with the terms provided by CGD
 go_terms_current <- GO.db::GO_dbconn() %>%
 	dplyr::tbl("go_term") %>%
-	dplyr::collect(n=Inf) %>%
+	dplyr::collect(n = Inf) %>%
 	dplyr::select(-`_id`)
 
 load("intermediate_data/ca_go_propagated_filtered.Rdata")
 go_terms <- ca_go_propagated_filtered %>%
-		dplyr::distinct(go_id, .keep_all=TRUE) %>%
+		dplyr::distinct(go_id, .keep_all = TRUE) %>%
 		dplyr::select(go_id, term, ontology, definition)
 
 network_scores <- go_pred %>%
@@ -40,7 +40,7 @@ network_scores %>%
 
 p <- ggplot2::ggplot(
 		data = network_scores %>%
-				dplyr::filter(network_name == "ca_coexp_full")) +
+				dplyr::filter(network_name == "CalCEN_full")) +
 		ggplot2::theme_bw() +
 		ggplot2::theme(legend.position = c(.8, .2)) +
 		ggplot2::geom_abline(
@@ -75,7 +75,7 @@ p <- ggplot2::ggplot(
 		data = network_scores %>%
 				dplyr::filter(
 						network_name %in% c(
-								"ca_coexp_full",
+								"CalCEN_full",
 								"ca_blastp",
 								"ca_sac_ortholog_genetic_ppi",
 								"ca_sac_ortholog_physical_ppi",

@@ -7,7 +7,7 @@ library(UpSetR)
 
 load("intermediate_data/chromosome_features.Rdata")
 load("intermediate_data/estimated_expression.Rdata")
-load("intermediate_data/ca_coexp.Rdata")
+load("intermediate_data/CalCEN.Rdata")
 load("intermediate_data/ca_blastp.Rdata")
 load("intermediate_data/ca_biogrid.Rdata")
 load("intermediate_data/sac_biogrid.Rdata")
@@ -20,7 +20,7 @@ load("intermediate_data/ca_go_propagated_filtered.Rdata")
 
 
 
-ca_coexp_1p <- ca_coexp %>%
+CalCEN_1p <- CalCEN %>%
 		dplyr::filter(
 				feature_name_1 != feature_name_2,
 				score >= .99)
@@ -59,8 +59,8 @@ yeast_net_long <- yeast_net_network %>%
 network_overlap_plot <- function() {
 	list(
 		`Co-Exp` = c(
-			ca_coexp_1p$feature_name_1 %>% unique,
-			ca_coexp_1p$feature_name_2 %>% unique) %>% unique,
+			CalCEN_1p$feature_name_1 %>% unique,
+			CalCEN_1p$feature_name_2 %>% unique) %>% unique,
 		`BlastP` = c(
 			ca_blastp_5E$feature_name_1,
 			ca_blastp_5E$feature_name_2) %>% unique,

@@ -7,25 +7,25 @@ library(magrittr)
 library(stringr)
 library(readr)
 
-load("intermediate_data/ca_coexp.Rdata")
+load("intermediate_data/CalCEN.Rdata")
 
 source("scripts/gene_report.R")
 
-top_ca_coexp <- ca_coexp %>%
+top_CalCEN <- CalCEN %>%
 	dplyr::filter(feature_name_1 < feature_name_2) %>%
 	dplyr::arrange(desc(score)) %>%
 	head(50) %>%
 	gene_gene_report()
 
 
-PGA52 <- ca_coexp %>%
+PGA52 <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C2_00100C_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
 	dplyr::select(-score) %>%
 	gene_gene_report()
 
-C7_00310C_A <- ca_coexp %>%
+C7_00310C_A <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C7_00310C_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -40,7 +40,7 @@ C7_00310C_A <- ca_coexp %>%
 
 
 
-FOX2 <- ca_coexp %>%
+FOX2 <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C3_00810C_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -66,7 +66,7 @@ missing_seeds <- seeds %>% dplyr::anti_join(
 
 # and in the top 30 associations to a seed
 # and itself not a seed
-seed_to_neighbor <- ca_coexp %>%
+seed_to_neighbor <- CalCEN %>%
 		dplyr::filter(feature_name_1 != feature_name_2) %>%
 		dplyr::semi_join(
 				seeds,
@@ -138,7 +138,7 @@ interactions %>%
 
 
 ### seeds for kyla
-ca_coexp_for_kyla <- ca_coexp %>%
+CalCEN_for_kyla <- CalCEN %>%
 	dplyr::semi_join(
 		readr::read_tsv("raw_data/seeds_selvig_20201013.tsv"),
 		by = c("feature_name_1" = "feature_name")) %>%
@@ -149,13 +149,13 @@ ca_coexp_for_kyla <- ca_coexp %>%
 	dplyr::ungroup() %>%
 	gene_gene_report()
 
-ca_coexp_for_kyla %>%
+CalCEN_for_kyla %>%
 		readr::write_tsv("product/seeds_for_selvid_coexp_20201013.tsv")
 
 ##########
 # ERG11
 
-report <- ca_coexp %>%
+report <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C5_00660C_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -166,7 +166,7 @@ report <- ca_coexp %>%
 report %>%
 	readr::write_tsv("product/ERG11_gene_gene_report_20201015.tsv")
 
-report <- ca_coexp %>%
+report <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C3_06660C_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -180,7 +180,7 @@ report %>%
 
 ####################
 #
-grace_null_goterm <- ca_coexp %>%
+grace_null_goterm <- CalCEN %>%
 		dplyr::semi_join(
 				readr::read_csv("raw_data/GRACE_NULLGOTERM.csv"),
 				by = c("feature_name_1" = "Gene ID")) %>%
@@ -197,7 +197,7 @@ grace_null_goterm %>%
 
 
 # hsp90
-report <- ca_coexp %>%
+report <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C7_02030W_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -209,7 +209,7 @@ report %>%
 	readr::write_tsv("product/C7_02030W_A_HSP90_gene_gene_report_20201027.tsv")
 
 ## cell wall
-grace_null_goterm <- ca_coexp %>%
+grace_null_goterm <- CalCEN %>%
 		dplyr::semi_join(
 				readr::read_csv("raw_data/cellwall_20201105.csv"),
 				by = c("feature_name_1" = "Gene ID")) %>%
@@ -225,7 +225,7 @@ grace_null_goterm %>%
 		readr::write_tsv("product/cellwall_gene_gene_report_20201105.tsv")
 
 # CR_06140W_A
-report <- ca_coexp %>%
+report <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "CR_06140W_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -238,7 +238,7 @@ report %>%
 
 
 # C1_14340C_A
-report <- ca_coexp %>%
+report <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C1_14340C_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -266,7 +266,7 @@ candida_dnaj %>%
 	readr::write_tsv("product/dnaj_sac_orthologs_20201114.tsv")
 
 
-report <- ca_coexp %>%
+report <- CalCEN %>%
 		dplyr::semi_join(
 		    candida_dnaj %>% dplyr::filter(!is.na(feature_name)),
 				by = c("feature_name_1" = "feature_name")) %>%
@@ -282,7 +282,7 @@ report %>%
 
 
 # C2_01370C_A
-report <- ca_coexp %>%
+report <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C2_01370C_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%
@@ -295,7 +295,7 @@ report %>%
 
 
 # C1_01800W_A
-report <- ca_coexp %>%
+report <- CalCEN %>%
 	dplyr::filter(feature_name_1 == "C1_01800W_A") %>%
 	dplyr::filter(feature_name_2 != feature_name_1) %>%
 	dplyr::arrange(desc(score)) %>%

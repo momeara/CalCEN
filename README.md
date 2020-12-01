@@ -4,7 +4,7 @@
 
 # Install
 
-    git clone git@github.com:momeara/ca_coexp
-    cd ca_coexp
+    git clone git@github.com:momeara/CalCEN
+    cd CalCEN
     Rscript -e "devtools::install_local('.')"
 

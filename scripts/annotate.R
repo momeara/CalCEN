@@ -10,7 +10,7 @@ library(magrittr)
 
 cat("Loading annotation datasets ... ")
 load("intermediate_data/chromosome_features.Rdata")
-load("intermediate_data/ca_coexp_full.Rdata")
+load("intermediate_data/CalCEN_full.Rdata")
 load("intermediate_data/ca_blastp.Rdata")
 load("intermediate_data/ca_biogrid.Rdata")
 
@@ -28,7 +28,7 @@ cat(" DONE\n")
 annotate_genes <- function(data){
 	coexp_data <- data %>%
 		dplyr::inner_join(
-			ca_coexp_full %>%
+			CalCEN_full %>%
 				dplyr::transmute(
 					feature_name = feature_name_1,
 					feature_name_2,
@@ -207,7 +207,7 @@ annotate_associations <- function(data){
 
 		(~cat("Add Co-expression scores\n")) %>%
 		dplyr::left_join(
-			ca_coexp_full %>%
+			CalCEN_full %>%
 				dplyr::select(
 					feature_name_1,
 					feature_name_2,

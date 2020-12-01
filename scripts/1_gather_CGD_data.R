@@ -193,3 +193,16 @@ ca_sac_orthologs <- readr::read_tsv(
 		sac_gene_name = readr::col_character(),
 		ygd_id = readr::col_character()))
 save(ca_sac_orthologs, file="intermediate_data/ca_sac_orthologs.Rdata")
+
+
+### Candida albicans SC5314 sequence assemblies in the Generic Feature Format (GFF) ###
+system("cd raw_data && wget http://www.candidagenome.org/download/gff/C_albicans_SC5314/Assembly22/C_albicans_SC5314_version_A22-s07-m01-r123_features.gff")
+system("cd raw_data ln -s C_albicans_SC5314_version_A22-s07-m01-r123_features.gff C_albicans_SC5314_A22_current_features.gff")
+system("cd raw_data && wget http://www.candidagenome.org/download/gff/C_albicans_SC5314/Assembly22/C_albicans_SC5314_version_A22-s07-m01-r123_features.gtf")
+system("cd raw_data ln -s C_albicans_SC5314_version_A22-s07-m01-r123_features.gtf C_albicans_SC5314_A22_current_features.gtf")
+
+system("cd raw_data && wget http://www.candidagenome.org/download/gff/C_albicans_SC5314/Assembly22/C_albicans_SC5314_version_A22-s07-m01-r123_intergenic.gff")
+system("cd raw_data ln -s C_albicans_SC5314_version_A22-s07-m01-r123_intergenic.gff C_albicans_SC5314_A22_current_intergenic.gff")
+
+
+# this is used for cross map analysis among other things

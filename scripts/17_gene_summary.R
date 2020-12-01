@@ -5,11 +5,11 @@ library(stringr)
 library(readr)
 
 load("intermediate_data/chromosome_features.Rdata")
-load("intermediate_data/ca_coexp_full.Rdata")
+load("intermediate_data/CalCEN_full.Rdata")
 
 
 ca_summary <- function(query_feature_name, coexp_cutoff=.95){
-  ca_coexp_full %>%
+  CalCEN_full %>%
     dplyr::select(
       feature_name = feature_name_1,
       coexp_feature_name = feature_name_2,

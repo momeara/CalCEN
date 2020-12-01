@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=estimate_ca_coexp_expression
+#SBATCH --job-name=estimate_CalCEN_expression
 #SBATCH --cpus-per-task=1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -29,31 +29,31 @@
 ###
 ###  A demon of running from the shell
 ###
-###     export BASE_DIR=/home/maom/opt/ca_coexp
-###     export JOB_DIR=/scratch/maom_root/maom99/maom/ca_coexp/estimate_expression_20201007
+###     export BASE_DIR=/home/maom/opt/CalCEN
+###     export JOB_DIR=/scratch/maom_root/maom99/maom/CalCEN/estimate_expression_20201007
 ###     export SLURM_ARRAY_TASK_ID=1
-###     /home/maom/opt/ca_coexp/scripts/run_estimate_expression_SLURM_wrapper.sh
+###     /home/maom/opt/CalCEN/scripts/run_estimate_expression_SLURM_wrapper.sh
 ###
 ###  this will set:
 ###
 ###     TAG: 20201007
-###     BASE_DIR: /home/maom/opt/ca_coexp
+###     BASE_DIR: /home/maom/opt/CalCEN
 ###     SLURM_ARRAY_TASK_ID: 1
 ###     Rscript: /home/maom/opt/bin/Rscript
-###     RUNS_FNAME: /home/maom/opt/ca_coexp/intermediate_data/todo_runs_20201007.tsv
-###     LOGS_DIR: /home/maom/opt/ca_coexp/intermediate_data/estimated_expression_20201007/logs
+###     RUNS_FNAME: /home/maom/opt/CalCEN/intermediate_data/todo_runs_20201007.tsv
+###     LOGS_DIR: /home/maom/opt/CalCEN/intermediate_data/estimated_expression_20201007/logs
 ###     TASK_NAME: estimated_expression_1
-###     JOB_DIR: /scratch/maom_root/maom99/maom/ca_coexp/estimated_expression_20201007
-###     TASK_DIR: /scratch/maom_root/maom99/maom/ca_coexp/estimated_expression_20201007/estimated_expression_1
+###     JOB_DIR: /scratch/maom_root/maom99/maom/CalCEN/estimated_expression_20201007
+###     TASK_DIR: /scratch/maom_root/maom99/maom/CalCEN/estimated_expression_20201007/estimated_expression_1
 ###
 ### and then call
 ###
-###     Rscript /home/maom/opt/ca_coexp/scripts/run_estimate_expression.R \
-###         --runs_fname /home/maom/opt/ca_coexp/intermediate_data/todo_runs_20201007.tsv \
+###     Rscript /home/maom/opt/CalCEN/scripts/run_estimate_expression.R \
+###         --runs_fname /home/maom/opt/CalCEN/intermediate_data/todo_runs_20201007.tsv \
 ###         --run_id 1 \
-###         --results_dir /home/maom/opt/ca_coexp/intermediate_data/estimated_expression_20201007 \
-###         --logs_dir /home/maom/opt/ca_coexp/intermediate_data/estimated_expression_20201007/logs \
-###         --work_dir /scratch/maom_root/maom99/maom/ca_coexp/estimated_expression_20201007/estimated_expression_1
+###         --results_dir /home/maom/opt/CalCEN/intermediate_data/estimated_expression_20201007 \
+###         --logs_dir /home/maom/opt/CalCEN/intermediate_data/estimated_expression_20201007/logs \
+###         --work_dir /scratch/maom_root/maom99/maom/CalCEN/estimated_expression_20201007/estimated_expression_1
 
 
 set -e 1
