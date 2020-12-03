@@ -15,7 +15,7 @@ load("intermediate_data/ca_runs_final.Rdata")
 load("intermediate_data/estimated_expression.Rdata")
 load("product/CalCEN_network_full_20201007.Rdata")
 
-date_code <- "20201130"
+date_code <- "20201203"
 
 #############################
 # Plot co-expression matrix #
@@ -80,21 +80,28 @@ exprs <- reshape2::acast(
 
 exprs <- log(1+exprs)
 
+exprs_ranked <- exprs %>%
+		rank(na.last = "keep", ties.method = "average") %>%
+		matrix(nrow = 6226, ncol = 853)
+exprs_ranked <- exprs_ranked/max(exprs_ranked)
 
-run_network <- EGAD::build_coexp_network(
-		exprs = exprs %>% t(),
-		gene.list = colnames(exprs))
+exprs_gene_dist <- dist(1-exprs_ranked)
+exprs_run_dist <- dist(1-t(exprs_ranked))
 
-run_order <- seriation::seriate(
-		x = dist(1-run_network),
+gene_order <- seriation::seriate(
+		x = exprs_gene_dist,
 		method = "OLO") %>%
 		seriation::get_order()
 
-exprs_log1p <- log(1+exprs)
-heatmap <- as.raster(exprs_log1p[gene_order, run_order]/max(exprs_log1p))
+run_order <- seriation::seriate(
+		x = exprs_run_dist,
+		method = "OLO") %>%
+		seriation::get_order()
+
+heatmap <- as.raster(exprs_ranked[gene_order, run_order])
 
 png(
-		"product/figures/ca_expression_heatmap_raster_20201130.png",
+		"product/figures/ca_expression_heatmap_raster_20201203.png",
 		width = length(run_order),
 		height = length(gene_order))
 plot.new()
@@ -107,3 +114,22 @@ rasterImage(
 		interpolate = FALSE)
 dev.off()
 
+
+# label expression matrix with "Rank Expression" with values [0-1] (black to white)
+# label co-exprssion matrix with "Rank Co-expression" with values [0-1] (black to white)
+scale_bar <- seq(0, 1, length.out = 11) %>%
+		rep(3) %>%
+		matrix(nrow = 3, ncol = 11, byrow = TRUE)
+png(
+		"product/figures/heatmap_raster_scale_bar_20201203.png",
+		width = 11 * 50,
+		height = 3 * 50)
+plot.new()
+rasterImage(
+		image = scale_bar,
+		xleft = 0,
+		ybottom = 0,
+		xright = 1,
+		ytop = 1,
+		interpolate = FALSE)
+dev.off()
