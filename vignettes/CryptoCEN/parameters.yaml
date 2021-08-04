@@ -1,0 +1,27 @@
+---
+source_data:
+    genome:
+        species_name: "Cryptococcus neoformans H99"
+        species_short_name: "CneoformansH99"
+        ncbi_taxon: 235443
+        transcript_fasta_url: "https://fungidb.org/common/downloads/release-49/CneoformansH99/fasta/data/FungiDB-49_CneoformansH99_AnnotatedTranscripts.fasta"
+        transcript_fasta_path: "raw_data/FungiDB-49_CneoformansH99_AnnotatedTranscripts.fasta"
+        gaf_annotations_url: "https://fungidb.org/common/downloads/release-49/CneoformansH99/gaf/FungiDB-49_CneoformansH99_GO.gaf"
+        gff_annotations_url: "https://fungidb.org/common/downloads/release-49/CneoformansH99/gff/data/FungiDB-49_CneoformansH99.gff"
+data_paths:
+    base_dir: "/home/maom/opt/CalCEN/vignettes/CryptoCEN"
+    scratch_dir: "/scratch/maom_root/maom99/maom/CryptoCEN"
+    expression_scratch_dir: "/scratch/maom_root/maom99/maom/CyproCEN/expression_runs"
+software_paths:
+    bowtie2_path: "/home/maom/opt/bowtie2-2.3.4.1-linux-x86_64"
+    fastq_dump_program: "/home/maom/opt/bin/fastq-dump"
+    rsem_path: "/home/maom/opt/RSEM/"
+    rsem_calculate_expression_program: "/home/maom/opt/RSEM/rsem-calculate-expression"
+    crossmap_path: "/home/maom/opt/crossmap"
+cluster_info:
+    cluster_type: "SLURM"
+    slurm_account: "maom99"
+    slurm_mail_user: "maom@umich.edu"
+    slurm_partition: "standard"
+
+
