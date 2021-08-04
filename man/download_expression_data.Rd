@@ -4,10 +4,10 @@
 \alias{download_expression_data}
 \title{Download RNA-Seq expression runs from SRA}
 \usage{
-download_expression_data(runs, sra_dir)
+download_expression_data(runs, sra_dir, verbose = TRUE)
 }
 \arguments{
-\item{runs:}{data.frame with column 'run_accession'}
+\item{runs:}{data.frame with columns ['study_accession', 'run_accession']}
 
 \item{sra_dir:}{directory where to save the expression data}
 }

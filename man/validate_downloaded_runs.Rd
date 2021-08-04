@@ -11,7 +11,7 @@ validate_downloaded_runs(sra_dir)
 }
 \description{
 use vdb-validate from the prefetch package to validate all
-   all .sra files under
+   all .sra files under <sra_dir>.
 }
 \details{
 <sra_dir>/<run_accession>/<run_accession>.sra
