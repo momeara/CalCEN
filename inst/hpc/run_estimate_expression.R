@@ -5,6 +5,7 @@
 
 
 library(optparse)
+library(assertthat)
 library(plyr)
 library(dplyr)
 library(readr)
@@ -35,8 +36,20 @@ option_list <- list(
 opt <- optparse::OptionParser(option_list = option_list) %>%
 		optparse::parse_args()
 
+# validate input
+assertthat::assert_that(
+		file.exists(opt$runs_fname),
+		msg = paste0("Runs file '", opt$runs_fname, "' does not exist."))
+asser
+
 ca_run <- readr::read_tsv(opt$runs_fname) %>%
 	dplyr::slice(as.numeric(opt$run_id))
+
+assertthat::assert_that(
+	"run_accession" %in% names(ca_run),
+	"sra_fname" %in% names(ca_run),
+	"is_paired" %in% names(ca_run),
+	msg = paste0("Runs file must have columns ['run_accession', 'sra_fname', 'is_paired']"))
 
 timing <- system.time({
 
@@ -49,9 +62,10 @@ timing <- system.time({
 		work_dir = opt$work_dir[1],
 		reference_genome_path = parameters$software_paths$reference_genome_path,
 		fastq_dump_program = parameters$software_paths$fastq_dump_program,
-		rsem_calculate_expression_program = parameters$software_paths$rsem_calculate_expression_program,
+		rsem_calculate_expression_program =
+				parameters$software_paths$rsem_calculate_expression_program,
 		bowtie2_path = parameters$software_paths$bowtie2_path)
 
 })
 
-cat("Run time: ", timing[3], "\n", sep="")
+cat("Run time: ", timing[3], "\n", sep = "")

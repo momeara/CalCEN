@@ -76,7 +76,7 @@ if (cluster_type == "SGE") {
 		cat(
 			"Monitor progress with ",
 			"'squeue | grep ", parameters$cluster_info$slurm_account, "'",
-			"\n", sep = "")
+			" on the command line.\n", sep = "")
 		cat("Check results when done: intermediate_data/estimated_expression_", tag, "/logs\n", sep = "")
 
 } else if (cluster_type == "LOCAL") {
