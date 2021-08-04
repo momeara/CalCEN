@@ -62,11 +62,15 @@ if (cluster_type == "SGE") {
 				"--export=",
 				  "TAG='", tag, "',",
 				  "BASE_DIR='", base_dir, "',",
+				  "SCRIPT='", system.file(
+						"hpc",
+						"run_estimate_expression.R",
+						package = "CalCEN"), "',",
 				  "JOB_DIR='", job_dir, "' ",
 				system.file(
 						"hpc",
 						"run_estimate_expression_SLURM_wrapper.sh",
-						package = "CalCEN")
+						package = "CalCEN"))
 		cat(cmd_str, "\n")
 		system(cmd_str)
 		cat("Monitor progress with 'squeue'\n", sep = "")

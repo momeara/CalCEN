@@ -79,14 +79,14 @@ mkdir -p ${TASK_DIR}
 echo "TAG: ${TAG}"
 echo "BASE_DIR: ${BASE_DIR}"
 echo "SLURM_ARRAY_TASK_ID: ${SLURM_ARRAY_TASK_ID}"
-echo "Rscript: $(which Rscript)"
+echo "Rscript: $(which Rscript) ${SCRIPT}"
 echo "RUNS_FNAME: ${RUNS_FNAME}"
 echo "LOGS_DIR: ${LOGS_DIR}"
 echo "JOB_DIR: ${JOB_DIR}"
 echo "TASK_NAME: ${TASK_NAME}"
 echo "TASK_DIR: ${TASK_DIR}"
 
-cmd="Rscript ${BASE_DIR}/scripts/run_estimate_expression.R \
+cmd="Rscript ${SCRIPT} \
   --runs_fname ${RUNS_FNAME} \
   --run_id ${SLURM_ARRAY_TASK_ID} \
   --results_dir ${RESULTS_DIR} \
