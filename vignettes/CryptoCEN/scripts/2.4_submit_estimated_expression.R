@@ -77,6 +77,7 @@ if (cluster_type == "SGE") {
 			"Monitor progress with ",
 			"'squeue | grep ", parameters$cluster_info$slurm_account, "'",
 			" on the command line.\n", sep = "")
+		cat("Check progress here: ", job_dir, "\n", sep = "")
 		cat("Check results when done: intermediate_data/estimated_expression_", tag, "/logs\n", sep = "")
 
 } else if (cluster_type == "LOCAL") {

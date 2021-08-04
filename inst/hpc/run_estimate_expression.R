@@ -40,7 +40,6 @@ opt <- optparse::OptionParser(option_list = option_list) %>%
 assertthat::assert_that(
 		file.exists(opt$runs_fname),
 		msg = paste0("Runs file '", opt$runs_fname, "' does not exist."))
-asser
 
 ca_run <- readr::read_tsv(opt$runs_fname) %>%
 	dplyr::slice(as.numeric(opt$run_id))
@@ -49,7 +48,9 @@ assertthat::assert_that(
 	"run_accession" %in% names(ca_run),
 	"sra_fname" %in% names(ca_run),
 	"is_paired" %in% names(ca_run),
-	msg = paste0("Runs file must have columns ['run_accession', 'sra_fname', 'is_paired']"))
+	msg = paste0(
+			"Runs file '", opt$runs_fname, "' must have columns\n  ['run_accession', 'sra_fname', 'is_paired']\n",
+			"Instead it has columns\n  ['", paste0(names(ca_run), collapse = "', '"), "']\n"))
 
 timing <- system.time({
 
