@@ -68,13 +68,6 @@ assertthat::assert_that(
 				" does not exist."))
 
 assertthat::assert_that(
-		file.exists(parameters$source_data$genome$transcript_fast_path),
-		msg = paste0(
-				"fastq dump program ",
-				"'", parameters$software_paths$fastq_dump_program, "'",
-				" does not exist."))
-
-assertthat::assert_that(
 		file.exists(parameters$software_paths$rsem_calculate_expression_program),
 		msg = paste0(
 				"RSEM program ",
