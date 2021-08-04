@@ -73,7 +73,10 @@ if (cluster_type == "SGE") {
 						package = "CalCEN"))
 		cat(cmd_str, "\n")
 		system(cmd_str)
-		cat("Monitor progress with 'squeue'\n", sep = "")
+		cat(
+			"Monitor progress with ",
+			"'squeue | grep ", parameters$cluster_info$slurm_account, "'",
+			"\n", sep = "")
 		cat("Check results when done: intermediate_data/estimated_expression_", tag, "/logs\n", sep = "")
 
 } else if (cluster_type == "LOCAL") {
