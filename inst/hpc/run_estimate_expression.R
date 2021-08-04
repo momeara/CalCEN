@@ -52,6 +52,43 @@ assertthat::assert_that(
 			"Runs file '", opt$runs_fname, "' must have columns\n  ['run_accession', 'sra_fname', 'is_paired']\n",
 			"Instead it has columns\n  ['", paste0(names(ca_run), collapse = "', '"), "']\n"))
 
+assertthat::assert_that(
+		file.exists(
+				paste0(parameters$data_paths$reference_genome_path, ".transcripts.fa")),
+		msg = paste0(
+				"reference genome path ",
+				"'", paste0(parameters$data_paths$reference_genome_path, ".transcripts.fa"), "'",
+				" does not exist. Make sure to run "))
+
+assertthat::assert_that(
+		file.exists(parameters$software_paths$fastq_dump_program),
+		msg = paste0(
+				"fastq dump program ",
+				"'", parameters$software_paths$fastq_dump_program, "'",
+				" does not exist."))
+
+assertthat::assert_that(
+		file.exists(parameters$source_data$genome$transcript_fast_path),
+		msg = paste0(
+				"fastq dump program ",
+				"'", parameters$software_paths$fastq_dump_program, "'",
+				" does not exist."))
+
+assertthat::assert_that(
+		file.exists(parameters$software_paths$rsem_calculate_expression_program),
+		msg = paste0(
+				"RSEM program ",
+				"'", parameters$software_paths$rsem_calculate_expression_program, "'",
+				" does not exist."))
+
+assertthat::assert_that(
+		file.exists(parameters$software_paths$bowtie2_path),
+		msg = paste0(
+				"Bowtie2 program ",
+				"'", parameters$software_paths$bowtie2_path, "'",
+				" does not exist."))
+
+
 timing <- system.time({
 
 	CalCEN::estimate_expression(
@@ -61,7 +98,7 @@ timing <- system.time({
 		results_dir = opt$results_dir[1],
 		logs_dir = opt$logs_dir[1],
 		work_dir = opt$work_dir[1],
-		reference_genome_path = parameters$software_paths$reference_genome_path,
+		reference_genome_path = parameters$data_paths$reference_genome_path,
 		fastq_dump_program = parameters$software_paths$fastq_dump_program,
 		rsem_calculate_expression_program =
 				parameters$software_paths$rsem_calculate_expression_program,

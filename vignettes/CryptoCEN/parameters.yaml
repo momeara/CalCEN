@@ -12,6 +12,7 @@ data_paths:
     base_dir: "/home/maom/opt/CalCEN/vignettes/CryptoCEN"
     scratch_dir: "/scratch/maom_root/maom99/maom/CryptoCEN"
     expression_scratch_dir: "/scratch/maom_root/maom99/maom/CyproCEN/expression_runs"
+    reference_genome_path: "/scratch/maom_root/maom99/maom/CryptoCEN/reference_genome/CneoformansH99"
 software_paths:
     bowtie2_path: "/home/maom/opt/bowtie2-2.3.4.1-linux-x86_64"
     fastq_dump_program: "/home/maom/opt/bin/fastq-dump"

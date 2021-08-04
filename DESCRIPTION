@@ -52,6 +52,7 @@ Collage:
     'load_parameters.R',
     'define_runs.R',
     'download_expression_data.R',
+    'prepare_reference_genome.R',
     'estimate_expression_data.R',
     'util.R'
 RoxygenNote: 7.1.1
