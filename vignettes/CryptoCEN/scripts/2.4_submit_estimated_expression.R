@@ -14,7 +14,7 @@ runs <- readr::read_tsv("intermediate_data/runs_20210803.tsv")
 tag <- CalCEN::date_code()
 results_dir <- paste0("intermediate_data/estimated_expression_", tag)
 
-done_runs <- results_dir %>% CalCEN::validate_estimated_runs()
+done_runs <- results_dir %>% CalCEN::validate_estimated_expression()
 
 # this is read by run_estimate_expression.R and
 # indexed into by the arrayed from the
@@ -22,7 +22,8 @@ done_runs <- results_dir %>% CalCEN::validate_estimated_runs()
 todo_runs <- runs %>% dplyr::anti_join(done_runs, by = "run_accession")
 todo_runs %>%
 		readr::write_tsv(
-				file = paste0("intermediate_data/todo_runs_", tag, ".tsv"))
+				file = paste0(
+						parameters$data_paths$base_dir, "/intermediate_data/todo_runs_", tag, ".tsv"))
 n_jobs <- nrow(todo_runs)
 
 cat("# Submitting ", n_jobs, " estimate expression jobs in parallel\n", sep = "")
@@ -42,11 +43,10 @@ if (cluster_type == "SGE") {
 		cat("Check results when done: intermediate_data/estimated_expression_", tag, "/logs\n", sep = "")
 
 } else if (cluster_type == "SLURM") {
-
+		base_dir <- parameters$data_paths$base_dir
 		job_dir <- paste0(
 				parameters$data_paths$scratch_dir,
 				"/estimated_expression_", tag)
-		base_dir <- getwd()
 		if (!dir.exists(job_dir)) {
 				cat("Creating job directory: ", job_dir, "\n", sep = "")
 				dir.create(job_dir, recursive = TRUE)
@@ -58,7 +58,7 @@ if (cluster_type == "SGE") {
 				"--mail-type=BEGIN,END,FAIL ",
 				"--array=1-", n_jobs, " ",
 				"--output='", job_dir, "/%j.log' ",
-				"--time=05:00:00 ",
+				"--time=3-15:00:00 ",
 				"--export=",
 				  "TAG='", tag, "',",
 				  "BASE_DIR='", base_dir, "',",

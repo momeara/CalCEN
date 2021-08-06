@@ -49,11 +49,12 @@ Remotes:
     cole-trapnell-lab/leidenbase,
     cole-trapnell-lab/monocle3
 Collage:
-    'load_parameters.R',
-    'define_runs.R',
-    'download_expression_data.R',
-    'prepare_reference_genome.R',
-    'estimate_expression_data.R',
-    'util.R'
+    "load_parameters.R",
+    "define_runs.R",
+    "download_expression_data.R",
+    "prepare_reference_genome.R",
+    "estimate_expression_data.R",
+    "validate_estimated_expression.R",
+    "util.R"
 RoxygenNote: 7.1.1
 Encoding: UTF-8
