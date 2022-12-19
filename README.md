@@ -9,6 +9,5 @@ https://doi.org/10.1128/mSphere.01245-20
 
 # Install
 
-    git clone git@github.com:momeara/CalCEN
-    cd CalCEN
-    Rscript -e "devtools::install_local('.')"
+    install.packages("remotes")
+    remotes::install_github("momeara/CalCEN")
